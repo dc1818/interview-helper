@@ -5,13 +5,15 @@ A self-contained interview preparation dashboard for junior software engineering
 ## Features
 
 - Twelve-week schedule with daily time blocks and direct study links
-- Forty-eight built-in technical flashcards covering software, web, algorithms, SQL, data engineering, testing, system design, and behavioral interviews
+- A sourced interview-question bank covering software, web, algorithms, SQL, data engineering, testing, system design, and behavioral interviews
+- Concise and expanded answers with examples, common traps, question-bank attribution, and technical-reference links
 - Browser-based spaced-repetition scheduling with Again, Hard, Good, and Easy ratings
 - Custom flashcard creation
 - Error log that turns mistakes into future review cards
 - Technical speaking prompts with a 90-second timer
 - Role-specific study adjustments
 - Progress stored locally in the browser
+- Focused Daily Workspace layout with separate Today, Schedule, Flashcards, Question Bank, Speaking, Resources, and Progress views
 - Responsive single-page design with no build step or external runtime dependency
 
 ## Run locally
