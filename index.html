@@ -4,953 +4,290 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Interview Helper</title>
-  <meta name="description" content="A self-contained 12-week interview preparation system with a study schedule, spaced-repetition flashcards, technical speaking practice, and an error log.">
-  <meta name="theme-color" content="#0b1220">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1220'/%3E%3Cpath d='M18 18h28v7H25v7h17v7H25v7h21v7H18z' fill='%235eead4'/%3E%3C/svg%3E">
+  <meta name="description" content="A focused interview preparation workspace with a schedule, sourced question bank, spaced repetition, speaking practice, and progress tracking.">
+  <meta name="theme-color" content="#f4f6f9">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232563eb'/%3E%3Cpath d='M18 17h28v8H26v7h16v7H26v8h20v8H18z' fill='white'/%3E%3C/svg%3E">
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #070c16;
-      --panel: #0e1728;
-      --panel-2: #121e32;
-      --line: #23324a;
-      --text: #ecf4ff;
-      --muted: #9aabc2;
-      --teal: #5eead4;
-      --teal-dark: #173d42;
-      --amber: #fbbf24;
-      --blue: #79a7ff;
-      --danger: #fb7185;
-      --radius: 18px;
-      --shadow: 0 18px 50px rgba(0,0,0,.28);
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-width: 320px;
-      background:
-        radial-gradient(circle at 12% 0%, rgba(94,234,212,.10), transparent 28rem),
-        radial-gradient(circle at 92% 4%, rgba(121,167,255,.10), transparent 25rem),
-        var(--bg);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 16px;
-      line-height: 1.55;
-    }
-    button, select, input, textarea { font: inherit; }
-    button, a { -webkit-tap-highlight-color: transparent; }
-    a { color: inherit; }
-    .shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; }
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      border-bottom: 1px solid rgba(35,50,74,.9);
-      background: rgba(7,12,22,.88);
-      backdrop-filter: blur(16px);
-    }
-    .topbar-inner {
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.02em; }
-    .brand-mark {
-      width: 34px; height: 34px; display: grid; place-items: center;
-      border-radius: 10px; background: var(--teal); color: #052b2a; font-weight: 950;
-      box-shadow: 0 0 0 5px rgba(94,234,212,.09);
-    }
-    nav { display: flex; gap: 6px; }
-    nav a {
-      padding: 8px 10px;
-      border-radius: 9px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: .9rem;
-      font-weight: 700;
-    }
-    nav a:hover, nav a:focus-visible { color: var(--text); background: var(--panel-2); outline: none; }
-    main { padding: 32px 0 80px; }
-    .eyebrow { margin: 0 0 8px; color: var(--teal); font-size: .82rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 850; }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 9px; max-width: 760px; font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.02; letter-spacing: -.05em; }
-    h2 { margin-bottom: 8px; font-size: clamp(1.55rem, 2.4vw, 2.2rem); letter-spacing: -.035em; }
-    h3 { margin-bottom: 6px; font-size: 1.06rem; letter-spacing: -.015em; }
-    .lede { max-width: 790px; color: var(--muted); font-size: 1.04rem; }
-    .hero {
-      display: grid;
-      grid-template-columns: 1.55fr .75fr;
-      gap: 18px;
-      align-items: stretch;
-      margin-bottom: 22px;
-    }
-    .hero-main, .panel {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(145deg, rgba(18,30,50,.96), rgba(10,18,31,.96));
-      box-shadow: var(--shadow);
-    }
-    .hero-main { padding: clamp(24px, 4vw, 46px); }
-    .hero-side { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
-    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 26px 0 0; }
-    .stat { padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: rgba(7,12,22,.48); }
-    .stat strong { display: block; font-size: 1.24rem; color: var(--text); }
-    .stat span { color: var(--muted); font-size: .78rem; }
-    .progress-ring {
-      --progress: 0deg;
-      width: 138px; height: 138px; border-radius: 50%; margin: 5px auto 18px;
-      display: grid; place-items: center;
-      background: conic-gradient(var(--teal) var(--progress), #1b2940 0);
-      position: relative;
-    }
-    .progress-ring::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #0d1727; }
-    .progress-label { position: relative; z-index: 1; text-align: center; }
-    .progress-label strong { display: block; font-size: 1.55rem; line-height: 1; }
-    .progress-label span { font-size: .75rem; color: var(--muted); }
-    .subtle { color: var(--muted); font-size: .9rem; }
-    .button {
-      border: 1px solid transparent;
-      border-radius: 11px;
-      padding: 10px 14px;
-      background: var(--teal);
-      color: #052725;
-      font-weight: 850;
-      cursor: pointer;
-    }
-    .button:hover { filter: brightness(1.06); }
-    .button.secondary { background: transparent; border-color: var(--line); color: var(--text); }
-    .button.small { padding: 7px 10px; font-size: .82rem; }
-    .button:focus-visible, .week-button:focus-visible, .day-button:focus-visible, .filter-button:focus-visible { outline: 3px solid rgba(94,234,212,.35); outline-offset: 2px; }
-    .section { margin-top: 54px; scroll-margin-top: 88px; }
-    .section-head { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 18px; }
-    .section-head p { margin: 0; color: var(--muted); max-width: 690px; }
-    .schedule {
-      display: grid;
-      grid-template-columns: 270px minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
-    }
-    .planner-nav { padding: 18px; position: sticky; top: 88px; }
-    .planner-nav h3 { margin-bottom: 13px; }
-    .week-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
-    .week-button, .day-button, .filter-button {
-      border: 1px solid var(--line); background: #0b1525; color: var(--muted); cursor: pointer;
-      border-radius: 10px; min-height: 38px; font-weight: 750;
-    }
-    .week-button.active, .day-button.active, .filter-button.active { background: var(--teal-dark); border-color: #2a7775; color: var(--teal); }
-    .jump-current { width: 100%; margin-top: 12px; }
-    .planner-main { padding: 22px; min-width: 0; }
-    .week-title-row { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
-    .week-tag { display: inline-flex; padding: 5px 9px; border-radius: 99px; background: rgba(121,167,255,.12); color: var(--blue); font-size: .78rem; font-weight: 800; }
-    .day-tabs { display: flex; gap: 7px; overflow-x: auto; padding: 4px 1px 13px; margin-top: 18px; scrollbar-width: thin; }
-    .day-button { min-width: 84px; padding: 7px 10px; }
-    .daily-summary {
-      display: flex; justify-content: space-between; align-items: center; gap: 20px;
-      border-top: 1px solid var(--line); padding-top: 20px; margin-top: 4px;
-    }
-    .daily-summary p { margin: 0; color: var(--muted); }
-    .time-badge { white-space: nowrap; color: var(--amber); font-weight: 850; }
-    .task-list { display: grid; gap: 10px; margin-top: 16px; }
-    .task {
-      display: grid; grid-template-columns: auto 58px minmax(0,1fr) auto; gap: 13px; align-items: center;
-      padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7,12,22,.5);
-    }
-    .task.done { opacity: .62; }
-    .task.done .task-name { text-decoration: line-through; }
-    .check {
-      appearance: none; width: 23px; height: 23px; border: 2px solid #40516b; border-radius: 7px; cursor: pointer; position: relative;
-    }
-    .check:checked { background: var(--teal); border-color: var(--teal); }
-    .check:checked::after { content: "✓"; position: absolute; color: #052725; left: 4px; top: -2px; font-weight: 950; }
-    .task-time { color: var(--amber); font-weight: 850; font-size: .86rem; }
-    .task-name { font-weight: 800; }
-    .task-note { color: var(--muted); font-size: .86rem; margin-top: 2px; }
-    .task-link { color: var(--teal); text-decoration: none; font-weight: 800; font-size: .84rem; white-space: nowrap; }
-    .task-link:hover { text-decoration: underline; }
-    .principles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
-    .principle { padding: 17px; }
-    .principle-number { color: var(--teal); font-size: .8rem; font-weight: 900; letter-spacing: .08em; }
-    .principle p { color: var(--muted); font-size: .9rem; margin: 6px 0 0; }
-    .tracks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .track { padding: 20px; position: relative; overflow: hidden; }
-    .track::before { content: ""; position: absolute; left: 0; top: 0; width: 5px; height: 100%; background: var(--track-color, var(--teal)); }
-    .track ul { margin: 13px 0 0; padding-left: 20px; color: var(--muted); }
-    .track li + li { margin-top: 6px; }
-    .speak-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; }
-    .speak-card { padding: 24px; }
-    .prompt {
-      min-height: 118px; display: flex; align-items: center; font-size: clamp(1.15rem, 2.4vw, 1.65rem);
-      font-weight: 800; line-height: 1.35; letter-spacing: -.02em;
-    }
-    .timer { font-variant-numeric: tabular-nums; font-size: 2.6rem; font-weight: 900; letter-spacing: -.04em; color: var(--teal); }
-    .button-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .answer-frame { display: grid; gap: 9px; margin-top: 14px; }
-    .answer-step { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; color: var(--muted); }
-    .answer-step b { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--teal-dark); color: var(--teal); }
-    .study-tools { display: grid; grid-template-columns: 1.35fr .65fr; gap: 16px; align-items: start; }
-    .review-card, .tool-panel { padding: 24px; }
-    .review-card { min-height: 430px; display: flex; flex-direction: column; }
-    .review-toolbar, .deck-stats, .rating-row { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
-    .review-toolbar { justify-content: space-between; margin-bottom: 18px; }
-    .review-toolbar select, .field select, .field input, .field textarea {
-      width: 100%; border: 1px solid var(--line); border-radius: 10px; background: #091322; color: var(--text); padding: 10px 11px;
-    }
-    .review-toolbar select { width: auto; min-width: 150px; }
-    .deck-stats { margin-bottom: 12px; }
-    .deck-stat { padding: 7px 10px; border-radius: 10px; background: #111f34; color: var(--muted); font-size: .82rem; }
-    .deck-stat strong { color: var(--text); }
-    .card-face { flex: 1; min-height: 220px; display: flex; flex-direction: column; justify-content: center; padding: 22px 4px; }
-    .card-label { color: var(--teal); text-transform: uppercase; letter-spacing: .12em; font-weight: 850; font-size: .76rem; }
-    .card-question { font-size: clamp(1.35rem, 2.8vw, 2rem); font-weight: 850; line-height: 1.28; margin: 12px 0; }
-    .card-answer { display: none; border-top: 1px solid var(--line); padding-top: 18px; color: #c8d5e7; white-space: pre-line; }
-    .card-answer.visible { display: block; }
-    .rating-row { display: none; margin-top: 14px; }
-    .rating-row.visible { display: grid; grid-template-columns: repeat(4, 1fr); }
-    .rate { border: 1px solid var(--line); border-radius: 10px; padding: 9px 6px; background: #0b1525; color: var(--text); cursor: pointer; font-weight: 800; }
-    .rate span { display: block; font-size: .69rem; color: var(--muted); font-weight: 650; }
-    .rate.again { border-color: #743548; color: #fda4af; }
-    .rate.good { border-color: #246861; color: var(--teal); }
-    .empty-card { color: var(--muted); text-align: center; padding: 50px 0; }
-    .field { display: grid; gap: 5px; margin-bottom: 12px; }
-    .field label { color: var(--muted); font-weight: 750; font-size: .82rem; }
-    .field textarea { min-height: 90px; resize: vertical; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .tool-tabs { display: flex; gap: 7px; margin-bottom: 16px; }
-    .tool-tab { flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 8px; background: #0b1525; color: var(--muted); cursor: pointer; font-weight: 800; }
-    .tool-tab.active { background: var(--teal-dark); color: var(--teal); border-color: #2a7775; }
-    .tool-pane { display: none; }
-    .tool-pane.active { display: block; }
-    .error-list { display: grid; gap: 9px; margin-top: 14px; max-height: 320px; overflow: auto; }
-    .error-item { padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: rgba(7,12,22,.5); }
-    .error-item p { color: var(--muted); font-size: .84rem; margin: 5px 0; }
-    .task-link.internal { border: 0; padding: 0; background: transparent; cursor: pointer; }
-    .srs-note { color: var(--muted); font-size: .83rem; margin: 13px 0 0; }
-    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 50; padding: 11px 14px; border-radius: 10px; background: var(--teal); color: #052725; font-weight: 850; opacity: 0; transform: translateY(12px); pointer-events: none; transition: .2s ease; }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .resource-controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 17px 0; }
-    .filter-button { padding: 8px 13px; }
-    .resources { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .resource { padding: 18px; display: flex; flex-direction: column; min-height: 184px; }
-    .resource.hidden { display: none; }
-    .resource .meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 11px; }
-    .pill { padding: 4px 8px; border-radius: 99px; background: #18263c; color: var(--blue); font-size: .72rem; font-weight: 800; }
-    .resource p { color: var(--muted); font-size: .88rem; flex: 1; }
-    .resource a { color: var(--teal); text-decoration: none; font-weight: 850; }
-    .resource a:hover { text-decoration: underline; }
-    .weekly-table { width: 100%; border-collapse: collapse; min-width: 680px; }
-    .weekly-table th, .weekly-table td { text-align: left; padding: 13px 14px; border-bottom: 1px solid var(--line); }
-    .weekly-table th { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
-    .weekly-table td:first-child { font-weight: 850; color: var(--teal); }
-    .table-wrap { overflow-x: auto; padding: 8px 16px; }
-    footer { border-top: 1px solid var(--line); padding: 30px 0 50px; color: var(--muted); font-size: .88rem; }
-    .noscript { margin: 20px 0; padding: 14px; background: #3b2630; border: 1px solid #80465a; border-radius: 12px; }
-    @media (max-width: 940px) {
-      .hero, .schedule, .speak-grid, .study-tools { grid-template-columns: 1fr; }
-      .planner-nav { position: static; }
-      .principles { grid-template-columns: repeat(2, 1fr); }
-      .tracks, .resources { grid-template-columns: repeat(2, 1fr); }
-      nav a:nth-child(2), nav a:nth-child(3) { display: none; }
-    }
-    @media (max-width: 640px) {
-      .shell { width: min(100% - 20px, 1220px); }
-      main { padding-top: 18px; }
-      .topbar-inner { min-height: 60px; }
-      nav a { padding: 7px; }
-      .brand span:last-child { display: none; }
-      .hero-main, .hero-side, .planner-main, .planner-nav, .speak-card { padding: 17px; }
-      .stat-row { grid-template-columns: 1fr; }
-      .principles, .tracks, .resources { grid-template-columns: 1fr; }
-      .task { grid-template-columns: auto 48px minmax(0,1fr); }
-      .task-link { grid-column: 3; }
-      .section { margin-top: 42px; }
-      .section-head, .daily-summary, .week-title-row { align-items: start; flex-direction: column; }
-      .week-grid { grid-template-columns: repeat(6, 1fr); }
-      .rating-row.visible { grid-template-columns: repeat(2, 1fr); }
-      .form-grid { grid-template-columns: 1fr; }
-    }
+    :root{color-scheme:light;--bg:#f4f6f9;--card:#fff;--ink:#172033;--muted:#667085;--line:#e2e7ef;--blue:#2563eb;--blue2:#1d4ed8;--blue-soft:#eaf1ff;--green:#16835d;--green-soft:#e7f7ef;--amber:#a86400;--amber-soft:#fff4dc;--red:#bd3650;--shadow:0 9px 26px rgba(30,42,65,.07);--radius:15px;--side:232px;--rail:286px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}.app{min-height:100vh;display:grid;grid-template-columns:var(--side) minmax(0,1fr) var(--rail)}
+    .sidebar{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid var(--line);padding:19px 13px;display:flex;flex-direction:column;z-index:20}.brand{display:flex;align-items:center;gap:11px;padding:3px 9px 22px;font-size:1.02rem;font-weight:850;letter-spacing:-.02em}.logo{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:var(--blue);color:#fff;font-weight:950;box-shadow:0 7px 16px rgba(37,99,235,.2)}.nav-label,.kicker{color:#8a94a6;font-size:.69rem;text-transform:uppercase;letter-spacing:.11em;font-weight:850}.nav-label{padding:0 10px 8px}.nav{display:grid;gap:4px}.nav-btn{width:100%;border:0;border-radius:10px;background:transparent;color:#556070;padding:9px 10px;display:flex;align-items:center;gap:10px;text-align:left;font-weight:730}.nav-btn:hover{background:#f5f7fa;color:var(--ink)}.nav-btn.active{background:var(--blue-soft);color:var(--blue2)}.nav-icon{width:28px;height:28px;border:1px solid currentColor;border-radius:8px;display:grid;place-items:center;font-size:.67rem;font-weight:900}.side-note{margin-top:auto;padding:12px 10px 2px;color:var(--muted);font-size:.75rem}
+    .workspace{min-width:0;padding:27px clamp(22px,3vw,42px) 70px}.view{display:none;max-width:1020px;margin:auto}.view.active{display:block}.mobile-head{display:none}.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;margin-bottom:22px}.page-head h1{margin:3px 0 4px;font-size:clamp(1.8rem,3vw,2.5rem);line-height:1.1;letter-spacing:-.045em}.page-head p{margin:0;max-width:660px;color:var(--muted)}.date-chip{white-space:nowrap;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-size:.8rem;font-weight:750}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.pad{padding:18px}
+    .hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:23px;border:0;background:linear-gradient(135deg,#17336d,#2868da);color:#fff}.hero .kicker{color:#c1d6ff}.hero h2{margin:5px 0 7px;font-size:clamp(1.35rem,2.5vw,2rem);letter-spacing:-.035em}.hero p{margin:0;max-width:680px;color:#dce8ff}.hero-num{text-align:right}.hero-num strong{display:block;font-size:2.5rem;line-height:1;letter-spacing:-.055em}.hero-num span{font-size:.74rem;color:#cbdcff}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:25px 0 11px}.section-head h2{margin:2px 0 0;font-size:1.15rem;letter-spacing:-.025em}.section-head p{margin:0;color:var(--muted);font-size:.82rem}.button{border:1px solid transparent;border-radius:10px;padding:9px 13px;background:var(--blue);color:#fff;font-weight:820;box-shadow:0 4px 10px rgba(37,99,235,.15)}.button:hover{background:var(--blue2)}.button.secondary{background:#fff;border-color:var(--line);color:var(--ink);box-shadow:none}.button.secondary:hover{background:#f8fafc}.button.small{padding:7px 10px;font-size:.78rem}.button.full{width:100%}.button:focus-visible,.nav-btn:focus-visible,.week-btn:focus-visible,.day-btn:focus-visible,.rate:focus-visible{outline:3px solid rgba(37,99,235,.23);outline-offset:2px}
+    .today-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr);gap:15px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.panel-head h2,.panel-head h3{margin:0;font-size:1rem}.panel-head span{color:var(--muted);font-size:.78rem}.task-list{display:grid;gap:8px}.task{display:grid;grid-template-columns:auto 52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:11px}.task.done{opacity:.65;background:#fafbfc}.task.done .task-name{text-decoration:line-through}.check{appearance:none;width:22px;height:22px;border:2px solid #b7c0cf;border-radius:7px;position:relative}.check:checked{background:var(--green);border-color:var(--green)}.check:checked:after{content:"✓";position:absolute;left:4px;top:-2px;color:#fff;font-weight:950}.task-time{color:var(--amber);font-size:.76rem;font-weight:850}.task-name{font-weight:820}.task-note{margin-top:2px;color:var(--muted);font-size:.78rem}.task-link{border:0;background:transparent;color:var(--blue);font-weight:800;font-size:.77rem;text-decoration:none;white-space:nowrap}.task-link:hover{text-decoration:underline}.mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.mini{padding:13px;border:1px solid var(--line);border-radius:11px;background:#fafbfd}.mini strong{display:block;font-size:1.3rem;letter-spacing:-.04em}.mini span{color:var(--muted);font-size:.73rem}.tip{margin-top:13px;padding:17px}.tip h3{margin:5px 0 5px}.tip p{margin:0;color:var(--muted);font-size:.82rem}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+    .rail{position:sticky;top:0;height:100vh;overflow:auto;border-left:1px solid var(--line);background:#fafbfd;padding:23px 17px}.rail h2{font-size:.9rem;margin:0 0 12px}.rail-card{padding:14px;margin-bottom:11px;box-shadow:none}.rail-big{font-size:2rem;font-weight:900;letter-spacing:-.05em;line-height:1}.rail-sub{color:var(--muted);font-size:.75rem;margin:5px 0 12px}.track{height:8px;border-radius:99px;background:#e5eaf1;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),#5aa2ff);border-radius:inherit}.quick{display:grid;gap:4px}.quick button{border:0;background:transparent;border-radius:8px;padding:8px;text-align:left;color:#4f5b6d;font-weight:730}.quick button:hover{background:#edf2f8;color:var(--blue)}
+    .planner{display:grid;grid-template-columns:185px minmax(0,1fr);gap:14px}.week-panel{padding:14px;align-self:start;position:sticky;top:20px}.week-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:9px 0}.week-btn,.day-btn,.filter-btn,.tool-tab{border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);font-weight:760}.week-btn{min-height:35px}.week-btn.active,.day-btn.active,.filter-btn.active,.tool-tab.active{background:var(--blue-soft);border-color:#b8cdf9;color:var(--blue2)}.planner-main{padding:19px;min-width:0}.week-title{display:flex;justify-content:space-between;gap:15px}.week-title h2{margin:5px 0 3px;font-size:1.4rem;letter-spacing:-.035em}.week-title p{margin:0;color:var(--muted)}.badge,.pill{display:inline-flex;padding:4px 8px;border-radius:99px;background:var(--blue-soft);color:var(--blue2);font-size:.69rem;font-weight:850}.day-tabs{display:flex;gap:6px;overflow:auto;margin:16px 0 14px;padding-bottom:3px}.day-btn{min-width:79px;padding:8px}.day-summary{display:flex;justify-content:space-between;gap:13px;border-top:1px solid var(--line);padding-top:14px;margin-bottom:11px}.day-summary h3{margin:0}.day-summary p{margin:3px 0 0;color:var(--muted)}.time-label{color:var(--amber);font-weight:850;white-space:nowrap}
+    .deck{display:grid;grid-template-columns:minmax(0,1fr) 276px;gap:14px;align-items:start}.review{padding:21px;min-height:565px;display:flex;flex-direction:column}.review-top{display:flex;align-items:center;justify-content:space-between;gap:11px;margin-bottom:17px}.stats{display:flex;gap:6px;flex-wrap:wrap}.stat{padding:5px 8px;border-radius:8px;background:#f5f7fa;color:var(--muted);font-size:.73rem}.stat strong{color:var(--ink)}select,input,textarea{border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:9px 10px}.review-top select{max-width:185px}.question-area{padding:19px 0 17px;flex:1}.meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}.pill{background:#f0f3f7;color:#596476}.pill.source{background:var(--green-soft);color:var(--green)}.question{font-size:clamp(1.4rem,3vw,2.1rem);font-weight:850;line-height:1.26;letter-spacing:-.035em;margin:0 0 17px}.answer[hidden]{display:none}.answer{border-top:1px solid var(--line);padding-top:16px}.answer-block{margin-bottom:14px}.answer-block h3{margin:0 0 5px;color:#7b8798;font-size:.7rem;text-transform:uppercase;letter-spacing:.09em}.answer-block p{margin:0;color:#354052}.answer-block.direct p{font-size:1.03rem;font-weight:720;color:var(--ink)}.answer-block.trap{padding:11px;border-radius:9px;background:var(--amber-soft)}.sources{display:flex;gap:7px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--line)}.source-link{padding:7px 9px;border-radius:8px;background:#f3f6fa;color:var(--blue);text-decoration:none;font-size:.74rem;font-weight:820}.rating{display:none;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}.rating.visible{display:grid}.rate{border:1px solid var(--line);border-radius:9px;padding:8px 4px;background:#fff;color:var(--ink);font-weight:820}.rate span{display:block;color:var(--muted);font-size:.64rem;font-weight:650}.rate.again{color:var(--red);border-color:#efb6c2}.rate.good{color:var(--green);border-color:#a8d9c7}.tools{padding:15px}.tool-tabs{display:flex;gap:6px;margin-bottom:13px}.tool-tab{flex:1;padding:8px}.tool-pane{display:none}.tool-pane.active{display:block}.field{display:grid;gap:4px;margin-bottom:9px}.field label{font-size:.73rem;color:var(--muted);font-weight:760}.field textarea{min-height:75px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+    .bank-toolbar{display:grid;grid-template-columns:minmax(210px,1fr) 170px 170px;gap:8px;margin-bottom:13px}.bank-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.bank-card{padding:15px;box-shadow:none;display:flex;flex-direction:column;min-height:196px}.bank-card h3{font-size:.98rem;line-height:1.4;margin:8px 0 9px}.bank-card p{color:var(--muted);font-size:.77rem;margin:auto 0 11px}.bank-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}.bank-source{color:var(--green);font-size:.69rem;font-weight:820}
+    .speak{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(270px,.85fr);gap:14px}.speak-card{padding:22px}.prompt{min-height:160px;display:flex;align-items:center;font-size:clamp(1.3rem,2.8vw,1.95rem);font-weight:850;line-height:1.32;letter-spacing:-.03em}.timer{font-size:3.3rem;font-weight:900;color:var(--blue);font-variant-numeric:tabular-nums;letter-spacing:-.055em}.steps{display:grid;gap:8px;margin-top:13px}.step{display:grid;grid-template-columns:27px 1fr;gap:8px;color:var(--muted)}.step b{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue)}
+    .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.filter-btn{padding:7px 10px}.resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.resource{padding:15px;box-shadow:none;display:flex;flex-direction:column;min-height:168px}.resource h3{margin:8px 0 5px;font-size:.98rem}.resource p{color:var(--muted);font-size:.78rem;flex:1}.resource a{color:var(--blue);font-weight:820;text-decoration:none;font-size:.78rem}.progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.progress-card{padding:17px;box-shadow:none}.progress-card strong{display:block;font-size:1.65rem;letter-spacing:-.045em}.progress-card span{color:var(--muted);font-size:.76rem}.week-progress{display:grid;grid-template-columns:72px 1fr 38px;gap:9px;align-items:center;margin-bottom:9px}.week-progress span{font-size:.75rem;font-weight:760}.error-list{display:grid;gap:7px;max-height:330px;overflow:auto}.error-item{padding:10px;border:1px solid var(--line);border-radius:9px;background:#fafbfd}.error-item strong{font-size:.81rem}.error-item p{margin:3px 0 0;color:var(--muted);font-size:.74rem}.empty{padding:42px 14px;text-align:center;color:var(--muted)}.toast{position:fixed;right:17px;bottom:17px;z-index:80;padding:10px 13px;border-radius:9px;background:#17243b;color:#fff;font-weight:760;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.mobile-nav{display:none}
+    @media(max-width:1150px){.app{grid-template-columns:205px minmax(0,1fr)}.rail{display:none}:root{--side:205px}}
+    @media(max-width:820px){.app{display:block}.sidebar{display:none}.workspace{padding:15px 13px 82px}.mobile-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.mobile-head .brand{padding:0}.mobile-nav{position:fixed;z-index:70;display:flex;left:0;right:0;bottom:0;overflow-x:auto;border-top:1px solid var(--line);background:rgba(255,255,255,.96);backdrop-filter:blur(14px);padding:6px 7px calc(6px + env(safe-area-inset-bottom))}.mobile-nav .nav-btn{min-width:82px;justify-content:center;flex-direction:column;gap:1px;padding:4px;font-size:.65rem}.mobile-nav .nav-icon{width:23px;height:23px;border:0}.today-grid,.planner,.deck,.speak{grid-template-columns:1fr}.week-panel{position:static}.bank-grid{grid-template-columns:1fr}.resources{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:550px){.page-head{display:block}.date-chip{display:inline-block;margin-top:9px}.hero{grid-template-columns:1fr}.hero-num{text-align:left}.task{grid-template-columns:auto 43px minmax(0,1fr)}.task-link{grid-column:3}.bank-toolbar{grid-template-columns:1fr}.resources,.progress-grid{grid-template-columns:1fr}.rating.visible{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.review{padding:16px}.review-top{align-items:start;flex-direction:column}.review-top select{width:100%;max-width:none}.week-grid{grid-template-columns:repeat(6,1fr)}}
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="shell topbar-inner">
-      <div class="brand"><span class="brand-mark">IH</span><span>Interview Helper</span></div>
-      <nav aria-label="Main navigation">
-        <a href="#plan">Plan</a>
-        <a href="#flashcards">Flashcards</a>
-        <a href="#speaking">Speaking</a>
-        <a href="#resources">Resources</a>
-      </nav>
-    </div>
-  </header>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">IH</span><span>Interview Helper</span></div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="nav-btn active" data-view="today"><span class="nav-icon">TD</span>Today</button>
+      <button class="nav-btn" data-view="schedule"><span class="nav-icon">12</span>Schedule</button>
+      <button class="nav-btn" data-view="flashcards"><span class="nav-icon">SR</span>Flashcards</button>
+      <button class="nav-btn" data-view="bank"><span class="nav-icon">QB</span>Question Bank</button>
+      <button class="nav-btn" data-view="speaking"><span class="nav-icon">90</span>Speaking Practice</button>
+      <button class="nav-btn" data-view="resources"><span class="nav-icon">↗</span>Resources</button>
+      <button class="nav-btn" data-view="progress"><span class="nav-icon">%</span>Progress</button>
+    </nav>
+    <div class="side-note">Your schedule, review history and notes stay in this browser.</div>
+  </aside>
 
-  <main class="shell">
-    <noscript><div class="noscript">Turn on JavaScript to use progress tracking, week navigation, and the speaking timer.</div></noscript>
-    <section class="hero" aria-labelledby="page-title">
-      <div class="hero-main">
-        <p class="eyebrow">Schedule · flashcards · speaking drills</p>
-        <h1 id="page-title">Interview Helper</h1>
-        <p class="lede">A self-contained practice system for a CS graduate who already codes. Follow the schedule, review technical concepts when they are due, record mistakes, and practice explaining what you know under interview pressure.</p>
-        <div class="stat-row" aria-label="Plan summary">
-          <div class="stat"><strong>13 hours</strong><span>each week</span></div>
-          <div class="stat"><strong>6 study days</strong><span>Sunday off</span></div>
-          <div class="stat"><strong>5 role families</strong><span>one shared core</span></div>
-        </div>
-      </div>
-      <aside class="hero-side panel" aria-label="Overall progress">
-        <div>
-          <p class="eyebrow">Your progress</p>
-          <div class="progress-ring" id="progressRing">
-            <div class="progress-label"><strong id="progressPercent">0%</strong><span id="progressCount">0 of 0 tasks</span></div>
-          </div>
-        </div>
-        <div>
-          <p class="subtle" id="planStatus">Choose “Start today” to make the dashboard follow your calendar.</p>
-          <button class="button" id="startPlan">Start this plan today</button>
-        </div>
-      </aside>
-    </section>
+  <main class="workspace">
+    <div class="mobile-head"><div class="brand"><span class="logo">IH</span><span>Interview Helper</span></div><span class="date-chip" id="mobileDate"></span></div>
 
-    <section class="section" id="plan">
-      <div class="section-head">
-        <div><p class="eyebrow">Daily workspace</p><h2>Your 12-week schedule</h2></div>
-        <p>Monday through Friday is two hours. Saturday is three hours. Sunday is deliberately off so the plan is sustainable while you apply for jobs.</p>
-      </div>
-      <div class="schedule">
-        <aside class="planner-nav panel">
-          <h3>Choose a week</h3>
-          <div class="week-grid" id="weekGrid" aria-label="Weeks 1 through 12"></div>
-          <button class="button secondary jump-current" id="jumpCurrent">Jump to current day</button>
-          <p class="subtle" style="margin:14px 0 0">Checks are saved on this device.</p>
-        </aside>
-        <div class="planner-main panel">
-          <div class="week-title-row">
-            <div><span class="week-tag" id="weekTag">Week 1</span><h2 id="weekTitle" style="margin-top:9px"></h2><p class="subtle" id="weekOutcome"></p></div>
-            <span class="time-badge">13 hr total</span>
-          </div>
-          <div class="day-tabs" id="dayTabs" role="tablist" aria-label="Days of the week"></div>
-          <div class="daily-summary">
-            <div><h3 id="dayTitle"></h3><p id="dayFocus"></p></div>
-            <span class="time-badge" id="dayTime"></span>
-          </div>
-          <div class="task-list" id="taskList"></div>
+    <section class="view active" id="view-today">
+      <div class="page-head"><div><span class="kicker">Daily workspace</span><h1>Today</h1><p>One focused session at a time. Finish the work, record the miss and move on.</p></div><span class="date-chip" id="todayDate"></span></div>
+      <article class="hero card"><div><span class="kicker">Current focus</span><h2 id="todayHeroTitle"></h2><p id="todayHeroText"></p></div><div class="hero-num"><strong id="todayMinutes">120</strong><span>planned minutes</span></div></article>
+      <div class="section-head"><div><span class="kicker">Study blocks</span><h2>Your work for today</h2></div><button class="button secondary small" id="startPlan">Start plan today</button></div>
+      <div class="today-grid">
+        <article class="card pad"><div class="panel-head"><h2 id="todayDay"></h2><span id="todayTaskCount"></span></div><div class="task-list" id="todayTasks"></div></article>
+        <div>
+          <article class="card pad"><div class="panel-head"><h2>At a glance</h2></div><div class="mini-grid"><div class="mini"><strong id="todayDue">0</strong><span>cards due</span></div><div class="mini"><strong id="todayPct">0%</strong><span>plan complete</span></div><div class="mini"><strong>13h</strong><span>weekly target</span></div><div class="mini"><strong>6</strong><span>study days</span></div></div></article>
+          <article class="card tip"><span class="kicker">Retrieval first</span><h3>Explain before you reveal</h3><p>Lead with a direct answer, explain the mechanism, then add an example or tradeoff.</p><div class="actions"><button class="button small" data-go="flashcards">Review cards</button><button class="button secondary small" data-go="speaking">Practice aloud</button></div></article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="flashcards">
-      <div class="section-head">
-        <div><p class="eyebrow">Spaced repetition</p><h2>Technical flashcards</h2></div>
-        <p>Answer before revealing the back. Rate your recall with Again, Hard, Good, or Easy; the next review date adjusts automatically and stays saved in this browser.</p>
+    <section class="view" id="view-schedule">
+      <div class="page-head"><div><span class="kicker">12-week plan</span><h1>Schedule</h1><p>Monday through Friday is two hours, Saturday is three hours and Sunday is deliberately off.</p></div><button class="button secondary" id="jumpCurrent">Jump to today</button></div>
+      <div class="planner">
+        <aside class="card week-panel"><strong>Choose a week</strong><div class="week-grid" id="weekGrid"></div><p style="margin:9px 0 0;color:var(--muted);font-size:.74rem">Completion is stored on this device.</p></aside>
+        <article class="card planner-main"><div class="week-title"><div><span class="badge" id="weekTag"></span><h2 id="weekTitle"></h2><p id="weekOutcome"></p></div><span class="time-label">13 hr total</span></div><div class="day-tabs" id="dayTabs"></div><div class="day-summary"><div><h3 id="dayTitle"></h3><p id="dayFocus"></p></div><span class="time-label" id="dayTime"></span></div><div class="task-list" id="taskList"></div></article>
       </div>
-      <div class="study-tools">
-        <article class="review-card panel">
-          <div class="review-toolbar">
-            <div class="deck-stats">
-              <span class="deck-stat"><strong id="dueCount">0</strong> due</span>
-              <span class="deck-stat"><strong id="learnedCount">0</strong> reviewed</span>
-              <span class="deck-stat"><strong id="cardTotal">0</strong> cards</span>
-            </div>
-            <select id="deckFilter" aria-label="Flashcard deck filter">
-              <option value="current">Current week</option>
-              <option value="due">All cards due</option>
-              <option value="all">All cards</option>
-              <option value="data">Data and SQL</option>
-              <option value="software">Software and web</option>
-              <option value="qa">Testing and QA</option>
-            </select>
-          </div>
-          <div class="card-face" id="cardFace">
-            <span class="card-label" id="cardLabel">Week 1</span>
-            <div class="card-question" id="cardQuestion"></div>
-            <div class="card-answer" id="cardAnswer"></div>
-            <div class="empty-card" id="emptyCard" hidden>No cards are due in this deck. Choose another deck or add your own card.</div>
-          </div>
-          <button class="button" id="revealCard">Reveal answer</button>
-          <div class="rating-row" id="ratingRow">
-            <button class="rate again" data-rating="again">Again<span>10 minutes</span></button>
-            <button class="rate" data-rating="hard">Hard<span id="hardInterval">1 day</span></button>
-            <button class="rate good" data-rating="good">Good<span id="goodInterval">3 days</span></button>
-            <button class="rate" data-rating="easy">Easy<span id="easyInterval">4 days</span></button>
-          </div>
-          <p class="srs-note">The scheduler uses the same four recall choices popularized by Anki. It is a lightweight browser implementation, not a copy of Anki's FSRS algorithm.</p>
+    </section>
+
+    <section class="view" id="view-flashcards">
+      <div class="page-head"><div><span class="kicker">Spaced repetition</span><h1>Review deck</h1><p>Every built-in card shows its interview-question bank and the technical reference used to check the answer.</p></div><button class="button secondary" data-go="bank">Browse question bank</button></div>
+      <div class="deck">
+        <article class="card review">
+          <div class="review-top"><div class="stats"><span class="stat"><strong id="dueCount">0</strong> due</span><span class="stat"><strong id="reviewedCount">0</strong> reviewed</span><span class="stat"><strong id="totalCards">0</strong> cards</span></div><select id="deckFilter" aria-label="Deck filter"><option value="due">All cards due</option><option value="week">Current week</option><option value="all">All cards</option><option>Software</option><option>Algorithms</option><option>Data</option><option>QA</option><option>System</option><option>Behavioral</option></select></div>
+          <div class="question-area" id="questionArea"><div class="meta" id="cardMeta"></div><h2 class="question" id="cardQuestion"></h2><button class="button" id="reveal">Reveal answer</button><div class="answer" id="answer" hidden><div class="answer-block direct"><h3>Direct answer</h3><p id="quickAnswer"></p></div><div class="answer-block"><h3>Interview explanation</h3><p id="deepAnswer"></p></div><div class="answer-block"><h3>Concrete example</h3><p id="exampleAnswer"></p></div><div class="answer-block trap"><h3>Common trap or qualification</h3><p id="trapAnswer"></p></div><div class="sources"><a class="source-link" id="questionSource" target="_blank" rel="noopener"></a><a class="source-link" id="technicalSource" target="_blank" rel="noopener"></a></div></div></div>
+          <div class="rating" id="rating"><button class="rate again" data-rate="again">Again<span id="againLabel"></span></button><button class="rate" data-rate="hard">Hard<span id="hardLabel"></span></button><button class="rate good" data-rate="good">Good<span id="goodLabel"></span></button><button class="rate" data-rate="easy">Easy<span id="easyLabel"></span></button></div>
         </article>
-
-        <aside class="tool-panel panel">
-          <div class="tool-tabs" role="tablist">
-            <button class="tool-tab active" data-pane="addCardPane">Add card</button>
-            <button class="tool-tab" data-pane="errorPane">Error log</button>
-          </div>
-          <div class="tool-pane active" id="addCardPane">
-            <h3>Create your own card</h3>
-            <p class="subtle">Turn a missed interview question or project lesson into future retrieval practice.</p>
-            <form id="cardForm">
-              <div class="field"><label for="customQuestion">Question</label><textarea id="customQuestion" required></textarea></div>
-              <div class="field"><label for="customAnswer">Answer</label><textarea id="customAnswer" required></textarea></div>
-              <div class="form-grid">
-                <div class="field"><label for="customCategory">Category</label><select id="customCategory"><option>Software</option><option>Data</option><option>QA</option><option>Algorithms</option><option>Behavioral</option></select></div>
-                <div class="field"><label for="customWeek">Week</label><select id="customWeek"></select></div>
-              </div>
-              <button class="button" type="submit">Add to deck</button>
-            </form>
-          </div>
-          <div class="tool-pane" id="errorPane">
-            <h3>Error log</h3>
-            <p class="subtle">Capture the mistake, its cause, and the cue that should trigger the right approach next time.</p>
-            <form id="errorForm">
-              <div class="field"><label for="errorMistake">What went wrong?</label><textarea id="errorMistake" required></textarea></div>
-              <div class="field"><label for="errorCause">Why did it happen?</label><textarea id="errorCause" required></textarea></div>
-              <div class="field"><label for="errorCue">Recognition cue</label><input id="errorCue" required></div>
-              <button class="button" type="submit">Save and make a card</button>
-            </form>
-            <div class="error-list" id="errorList"></div>
-          </div>
+        <aside class="card tools">
+          <div class="tool-tabs"><button class="tool-tab active" data-pane="cardPane">Add card</button><button class="tool-tab" data-pane="errorPane">Error log</button></div>
+          <div class="tool-pane active" id="cardPane"><div class="field"><label for="customQuestion">Question</label><textarea id="customQuestion"></textarea></div><div class="field"><label for="customAnswer">Answer</label><textarea id="customAnswer"></textarea></div><div class="two"><div class="field"><label for="customCategory">Category</label><select id="customCategory"><option>Software</option><option>Algorithms</option><option>Data</option><option>QA</option><option>System</option><option>Behavioral</option></select></div><div class="field"><label for="customWeek">Week</label><select id="customWeek"></select></div></div><button class="button full" id="addCard">Add to deck</button></div>
+          <div class="tool-pane" id="errorPane"><div class="field"><label for="errorQuestion">Missed question or problem</label><textarea id="errorQuestion"></textarea></div><div class="field"><label for="errorLesson">Correct idea and recognition cue</label><textarea id="errorLesson"></textarea></div><button class="button full" id="addError">Save and create card</button><div class="error-list" id="errorList" style="margin-top:11px"></div></div>
         </aside>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="method-title">
-      <div class="section-head"><div><p class="eyebrow">How to use each block</p><h2 id="method-title">The rules that make the hours count</h2></div></div>
-      <div class="principles">
-        <article class="principle panel"><span class="principle-number">01 · CLOSED BOOK FIRST</span><p>Attempt the problem or explanation before opening notes. Retrieval is the part that prepares you for interviews.</p></article>
-        <article class="principle panel"><span class="principle-number">02 · SAY IT OUT LOUD</span><p>End concept work with a 60–90 second spoken answer: definition, mechanism, tradeoff, example.</p></article>
-        <article class="principle panel"><span class="principle-number">03 · KEEP AN ERROR LOG</span><p>Record the mistake, why it happened, and the recognition cue that should trigger the right approach next time.</p></article>
-        <article class="principle panel"><span class="principle-number">04 · BUILD EVIDENCE</span><p>Turn one study block each week into a commit, test, diagram, README note, or measurable project improvement.</p></article>
-      </div>
+    <section class="view" id="view-bank">
+      <div class="page-head"><div><span class="kicker">Public interview sources</span><h1>Question bank</h1><p>Questions are adapted from the linked public banks; answers are independently written and checked against technical documentation.</p></div><span class="date-chip"><strong id="bankCount">0</strong> questions</span></div>
+      <div class="bank-toolbar"><input id="bankSearch" type="search" placeholder="Search questions, topics or sources"><select id="bankCategory"><option value="All">All categories</option><option>Software</option><option>Algorithms</option><option>Data</option><option>QA</option><option>System</option><option>Behavioral</option></select><select id="bankLevel"><option value="All">All levels</option><option>Junior</option><option>Junior–Mid</option></select></div><div class="bank-grid" id="bankGrid"></div>
     </section>
 
-    <section class="section" id="speaking">
-      <div class="section-head">
-        <div><p class="eyebrow">Interview articulation</p><h2>Explain-it-out-loud trainer</h2></div>
-        <p>Do not memorize paragraphs. Practice a stable answer shape until you can adapt it to any technical question.</p>
-      </div>
-      <div class="speak-grid">
-        <article class="speak-card panel">
-          <p class="eyebrow">Current prompt</p>
-          <div class="prompt" id="speakPrompt"></div>
-          <div class="button-row">
-            <button class="button" id="newPrompt">New prompt</button>
-            <button class="button secondary" id="startTimer">Start 90 seconds</button>
-          </div>
-        </article>
-        <article class="speak-card panel">
-          <p class="eyebrow">Answer structure</p>
-          <div class="timer" id="timer">01:30</div>
-          <div class="answer-frame">
-            <div class="answer-step"><b>1</b><span><strong>Define it:</strong> one plain-English sentence.</span></div>
-            <div class="answer-step"><b>2</b><span><strong>Explain it:</strong> what happens and why.</span></div>
-            <div class="answer-step"><b>3</b><span><strong>Trade off:</strong> when it helps and what it costs.</span></div>
-            <div class="answer-step"><b>4</b><span><strong>Ground it:</strong> a project or concrete example.</span></div>
-          </div>
-        </article>
-      </div>
+    <section class="view" id="view-speaking">
+      <div class="page-head"><div><span class="kicker">Interview articulation</span><h1>Speaking practice</h1><p>Use a stable answer shape, not a memorized paragraph. Aim for a useful answer in 60–90 seconds.</p></div></div>
+      <div class="speak"><article class="card speak-card"><span class="kicker">Current prompt</span><div class="prompt" id="speakPrompt"></div><div class="actions"><button class="button" id="newPrompt">New prompt</button><button class="button secondary" id="startTimer">Start 90 seconds</button></div></article><article class="card speak-card"><span class="kicker">Answer structure</span><div class="timer" id="timer">01:30</div><div class="steps"><div class="step"><b>1</b><span><strong>Answer:</strong> lead with one direct sentence.</span></div><div class="step"><b>2</b><span><strong>Mechanism:</strong> explain what happens and why.</span></div><div class="step"><b>3</b><span><strong>Tradeoff:</strong> say when it helps and what it costs.</span></div><div class="step"><b>4</b><span><strong>Example:</strong> ground it in code or a project.</span></div></div></article></div>
     </section>
 
-    <section class="section" id="tracks">
-      <div class="section-head">
-        <div><p class="eyebrow">Role-specific emphasis</p><h2>Use one core, then lean toward the job</h2></div>
-        <p>The base plan prepares you broadly. When an interview is scheduled, use these swaps for the final seven days instead of adding more hours.</p>
-      </div>
-      <div class="tracks">
-        <article class="track panel" style="--track-color:#5eead4"><h3>Software / Full-stack / Backend</h3><ul><li>Replace one SQL block with JSDen or Full Stack Open.</li><li>Prioritize APIs, HTTP, async behavior, databases, caching, and testing.</li><li>Use JavaScript for one coding problem every fourth Saturday.</li></ul></article>
-        <article class="track panel" style="--track-color:#79a7ff"><h3>Data Engineering / Data Developer</h3><ul><li>Keep both DataLemur blocks and the Zoomcamp project block.</li><li>Prioritize SQL, modeling, ETL, orchestration, Docker, and pipeline failure modes.</li><li>Explain data quality and idempotency using project examples.</li></ul></article>
-        <article class="track panel" style="--track-color:#fbbf24"><h3>QA Automation / SDET</h3><ul><li>Replace one Zoomcamp block with Playwright or pytest practice.</li><li>Prioritize test layers, selectors, fixtures, mocking, CI, and debugging.</li><li>Turn a personal project workflow into an automated regression test.</li></ul></article>
-        <article class="track panel" style="--track-color:#fb7185"><h3>Data Analyst + Programming</h3><ul><li>Keep SQL, Python, pandas, and the explanation drills.</li><li>Replace system-design depth with metric definition and stakeholder questions.</li><li>Practice explaining how a result changes a decision.</li></ul></article>
-        <article class="track panel" style="--track-color:#c084fc"><h3>Timed coding screen</h3><ul><li>Use Python unless the employer requires another language.</li><li>Narrate assumptions, complexity, tests, and edge cases.</li><li>Stop after the time limit and review the decision process, not only the answer.</li></ul></article>
-        <article class="track panel" style="--track-color:#34d399"><h3>Micro1-style interview</h3><ul><li>Keep full-stack, JS/TS, debugging, and verbal ownership stories.</li><li>Practice concise answers before adding depth.</li><li>Use the 25-minute mock block in Weeks 10–12.</li></ul></article>
-      </div>
-    </section>
+    <section class="view" id="view-resources"><div class="page-head"><div><span class="kicker">Direct links</span><h1>Resources</h1><p>Use these for active practice and answer verification, not as another curriculum.</p></div></div><div class="filters" id="resourceFilters"></div><div class="resources" id="resourceGrid"></div></section>
 
-    <section class="section" id="resources">
-      <div class="section-head">
-        <div><p class="eyebrow">Direct links</p><h2>Study resources in one place</h2></div>
-        <p>Start with the core six. The reference links are for targeted gaps, not a second curriculum competing for your time.</p>
-      </div>
-      <div class="resource-controls" id="resourceFilters" aria-label="Filter resources"></div>
-      <div class="resources" id="resourceGrid"></div>
-    </section>
-
-    <section class="section" aria-labelledby="cadence-title">
-      <div class="section-head"><div><p class="eyebrow">Recurring cadence</p><h2 id="cadence-title">The week at a glance</h2></div></div>
-      <div class="panel table-wrap">
-        <table class="weekly-table">
-          <thead><tr><th>Day</th><th>Time</th><th>Primary work</th><th>What you produce</th></tr></thead>
-          <tbody>
-            <tr><td>Monday</td><td>2 hr</td><td>LeetCode + JSDen + verbal recall</td><td>One solved pattern and one spoken answer</td></tr>
-            <tr><td>Tuesday</td><td>2 hr</td><td>Data Engineering Zoomcamp + SQL</td><td>Pipeline notes/code and two SQL solutions</td></tr>
-            <tr><td>Wednesday</td><td>2 hr</td><td>LeetCode + Python depth + JSDen</td><td>One solution, one Python note, one concept answer</td></tr>
-            <tr><td>Thursday</td><td>2 hr</td><td>Zoomcamp + SQL + project note</td><td>A working increment and updated error log</td></tr>
-            <tr><td>Friday</td><td>2 hr</td><td>LeetCode + system design + speaking</td><td>A diagram and a 90-second explanation</td></tr>
-            <tr><td>Saturday</td><td>3 hr</td><td>Project + timed coding/interview practice</td><td>A portfolio artifact and weekly review</td></tr>
-            <tr><td>Sunday</td><td>Off</td><td>Rest; optional 15-minute recall only</td><td>No catch-up debt</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <section class="view" id="view-progress"><div class="page-head"><div><span class="kicker">Review and adjust</span><h1>Progress</h1><p>Track completed study blocks, reviews and repeated misses without turning the plan into a streak contest.</p></div></div><div class="progress-grid"><article class="card progress-card"><strong id="progressPct">0%</strong><span>schedule completed</span></article><article class="card progress-card"><strong id="progressTasks">0 / 0</strong><span>study blocks finished</span></article><article class="card progress-card"><strong id="progressReviews">0</strong><span>flashcard reviews</span></article></div><div class="today-grid"><article class="card pad"><div class="panel-head"><h2>Completion by week</h2></div><div id="weekProgress"></div></article><article class="card pad"><div class="panel-head"><h2>Recent error log</h2></div><div class="error-list" id="progressErrors"></div></article></div></section>
   </main>
 
-  <footer><div class="shell">The goal is interview-ready retrieval, not collecting courses. Your schedule, flashcards, review history, and error log are stored locally in your browser.</div></footer>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <aside class="rail"><h2>Study queue</h2><article class="card rail-card"><div class="rail-big" id="railDue">0</div><div class="rail-sub">flashcards due now</div><button class="button full" data-go="flashcards">Start review</button></article><article class="card rail-card"><div class="panel-head"><h2>Overall progress</h2><span id="railPct">0%</span></div><div class="track"><div class="fill" id="railFill"></div></div><div class="rail-sub" id="railCount"></div></article><h2 style="margin-top:21px">Quick actions</h2><div class="quick"><button data-go="schedule">View the full schedule</button><button data-go="bank">Browse sourced questions</button><button data-go="speaking">Run a 90-second answer</button><button data-go="progress">Review missed concepts</button></div></aside>
+</div>
 
-  <script>
-    const links = {
-      jsden: "https://jsden.com/",
-      leetcode: "https://leetcode.com/studyplan/leetcode-75/",
-      datalemur: "https://datalemur.com/questions?category=SQL",
-      zoomcamp: "https://github.com/DataTalksClub/data-engineering-zoomcamp",
-      system: "https://github.com/donnemartin/system-design-primer",
-      python: "https://docs.python.org/3/tutorial/",
-      fullstack: "https://fullstackopen.com/en/",
-      mdn: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
-      typescript: "https://www.typescriptlang.org/docs/handbook/intro.html",
-      node: "https://nodejs.org/en/learn",
-      playwright: "https://playwright.dev/python/docs/intro",
-      pytest: "https://docs.pytest.org/en/stable/getting-started.html",
-      sqlbolt: "https://sqlbolt.com/",
-      pandas: "https://pandas.pydata.org/docs/getting_started/index.html",
-      roadmap: "https://roadmap.sh/"
-    };
+<nav class="mobile-nav" aria-label="Mobile navigation"><button class="nav-btn active" data-view="today"><span class="nav-icon">TD</span>Today</button><button class="nav-btn" data-view="schedule"><span class="nav-icon">12</span>Schedule</button><button class="nav-btn" data-view="flashcards"><span class="nav-icon">SR</span>Cards</button><button class="nav-btn" data-view="bank"><span class="nav-icon">QB</span>Bank</button><button class="nav-btn" data-view="speaking"><span class="nav-icon">90</span>Speak</button><button class="nav-btn" data-view="resources"><span class="nav-icon">↗</span>Links</button><button class="nav-btn" data-view="progress"><span class="nav-icon">%</span>Progress</button></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    const themes = [
-      ["Baseline and retrieval", "Set your baseline, establish the error log, and explain familiar concepts without notes.", "Arrays, strings, hash maps · JS execution basics · SELECT, filtering, aggregation · DE environment"],
-      ["Asynchronous JavaScript and SQL joins", "Make async behavior and relational joins easy to explain under time pressure.", "Two pointers, sliding window · closures, promises, event loop · JOIN and GROUP BY · Docker/SQL"],
-      ["HTTP, APIs, and Python depth", "Connect client, server, and database behavior in one clear mental model.", "Linked lists, binary search · HTTP and REST · Python iterators/errors/testing · CTEs and subqueries"],
-      ["Databases and dependable CRUD", "Build and explain a small data-backed API with sensible tests and failure handling.", "Trees and recursion · transactions and indexes · PostgreSQL · JavaScript algorithm implementation"],
-      ["Testing and debugging", "Diagnose failures methodically and distinguish unit, integration, API, and end-to-end tests.", "Heaps · pytest and Playwright · SQL window functions · reproducible debugging"],
-      ["TypeScript and orchestration", "Use TypeScript confidently and explain how scheduled data work remains observable and repeatable.", "Graphs, BFS/DFS · TS narrowing/generics · orchestration · API contracts"],
-      ["React state and test automation", "Explain state, rendering, test design, mocking, and maintainable automation.", "Intervals and greedy · React rendering · fixtures/mocks/selectors · advanced SQL"],
-      ["Backend performance and system design", "Reason about caching, queues, scaling, security, and data consistency without overengineering.", "Caching and auth · system boundaries · warehouses/dbt · JavaScript algorithm implementation"],
-      ["Data pipelines and portfolio evidence", "Turn your existing software experience into one clean, measurable technical story.", "Batch pipelines · transformation and quality · medium problems · project README evidence"],
-      ["Timed problem solving", "Perform within realistic interview limits while narrating assumptions, choices, and tests.", "25-minute coding screens · API/system design · SQL case study · debugging narration"],
-      ["Full interview simulations", "Combine technical recall, coding, project stories, and ownership examples in complete mocks.", "Mixed LeetCode · mock interviews · STAR stories · gap repair"],
-      ["Consolidation and interview week", "Reduce load, close only high-value gaps, and arrive rested with practiced answers.", "Targeted review · final mock · portfolio polish · JavaScript algorithm implementation"]
-    ];
+<script>
+const links={
+  jsBank:"https://www.greatfrontend.com/questions/javascript-interview-questions",
+  reactBank:"https://github.com/greatfrontend/top-reactjs-interview-questions",
+  frontBank:"https://www.frontendinterviewhandbook.com/",
+  leetcode:"https://leetcode.com/studyplan/leetcode-75/",
+  top150:"https://leetcode.com/studyplan/top-interview-150/",
+  datalemur:"https://datalemur.com/questions",
+  deBank:"https://github.com/data-engineering-interviews/data-engineering-interview-questions",
+  systemBank:"https://github.com/donnemartin/system-design-primer",
+  sdetBank:"https://github.com/Test-Architect/sdet-interview-question-catalog",
+  behaviorBank:"https://www.techinterviewhandbook.org/behavioral-interview-questions/",
+  mdn:"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+  mdnEquality:"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness",
+  mdnClosure:"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",
+  mdnPromise:"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+  mdnLoop:"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop",
+  mdnHttp:"https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status",
+  typescript:"https://www.typescriptlang.org/docs/handbook/2/narrowing.html",
+  reactRender:"https://react.dev/learn/render-and-commit",
+  reactEffect:"https://react.dev/learn/synchronizing-with-effects",
+  reactLists:"https://react.dev/learn/rendering-lists",
+  python:"https://docs.python.org/3/tutorial/",
+  postgres:"https://www.postgresql.org/docs/current/queries.html",
+  pgIndex:"https://www.postgresql.org/docs/current/indexes.html",
+  pgTx:"https://www.postgresql.org/docs/current/tutorial-transactions.html",
+  playwright:"https://playwright.dev/docs/best-practices",
+  pytest:"https://docs.pytest.org/en/stable/how-to/fixtures.html",
+  zoomcamp:"https://github.com/DataTalksClub/data-engineering-zoomcamp",
+  fullstack:"https://fullstackopen.com/en/",
+  pandas:"https://pandas.pydata.org/docs/getting_started/index.html"
+};
+const bankNames={jsBank:"GreatFrontEnd JavaScript",reactBank:"GreatFrontEnd React",frontBank:"Front End Interview Handbook",leetcode:"LeetCode 75",top150:"LeetCode Top Interview 150",datalemur:"DataLemur",deBank:"Data Engineering Interview Questions",systemBank:"System Design Primer",sdetBank:"SDET Interview Catalog",behaviorBank:"Tech Interview Handbook"};
+const refNames={mdn:"MDN JavaScript Guide",mdnEquality:"MDN Equality Comparisons",mdnClosure:"MDN Closures",mdnPromise:"MDN Promise Reference",mdnLoop:"MDN Event Loop",mdnHttp:"MDN HTTP Reference",typescript:"TypeScript Handbook",reactRender:"React Render and Commit",reactEffect:"React Effects",reactLists:"React Lists",python:"Python Documentation",postgres:"PostgreSQL Documentation",pgIndex:"PostgreSQL Indexes",pgTx:"PostgreSQL Transactions",playwright:"Playwright Best Practices",pytest:"pytest Documentation",zoomcamp:"Data Engineering Zoomcamp",behaviorBank:"Tech Interview Handbook",systemBank:"System Design Primer"};
 
-    const weekdayTemplates = [
-      { name:"Monday", focus:"Algorithms + full-stack recall", minutes:120, tasks:[
-        [45,"LeetCode pattern practice","Solve one planned problem in Python. Write complexity and one recognition cue.","leetcode"],
-        [60,"JSDen interview practice","Review the week's JS/TS, React, Node, API, or database theme; answer before revealing notes.","jsden"],
-        [15,"Closed-book verbal recap","Review the current week's flashcards, then explain one answer using definition → mechanism → tradeoff → example.","internal-cards"]
-      ]},
-      { name:"Tuesday", focus:"Data engineering + SQL", minutes:120, tasks:[
-        [60,"Data Engineering Zoomcamp","Work the module aligned with this week's topic. Favor code and exercises over passive video.","zoomcamp"],
-        [45,"DataLemur SQL","Solve two questions or one medium question; compare alternate query shapes.","datalemur"],
-        [15,"Data concept explanation","Use the Data and SQL deck, then explain one answer aloud and name its likely failure mode.","internal-data"]
-      ]},
-      { name:"Wednesday", focus:"Algorithms + Python + JS/TS", minutes:120, tasks:[
-        [45,"LeetCode pattern practice","Solve one problem, then rerun it from a blank editor without the solution open.","leetcode"],
-        [45,"Python depth block","Study one interview-relevant language behavior and write a tiny proof-of-behavior example.","python"],
-        [30,"JSDen rapid recall","Answer several short questions and add missed concepts to the error log.","jsden"]
-      ]},
-      { name:"Thursday", focus:"Pipeline building + SQL", minutes:120, tasks:[
-        [60,"Zoomcamp project work","Implement, debug, or document one pipeline increment. Make a commit-sized outcome.","zoomcamp"],
-        [45,"DataLemur SQL","Practice joins, aggregation, CTEs, windows, or modeling based on this week's theme.","datalemur"],
-        [15,"Error-log update","Write what failed, why it failed, and the cue that should prevent the same mistake.","internal-errors"]
-      ]},
-      { name:"Friday", focus:"Algorithms + system design + speaking", minutes:120, tasks:[
-        [45,"LeetCode timed solve","Use a 35-minute cap, then spend 10 minutes reviewing reasoning and test coverage.","leetcode"],
-        [45,"System design fundamentals","Sketch one small system or component. State requirements, data flow, bottleneck, and tradeoff.","system"],
-        [30,"Two spoken answers","Use the trainer below. Record answers if useful; redo only the weakest one.","internal-speaking"]
-      ]},
-      { name:"Saturday", focus:"Portfolio evidence + realistic practice", minutes:180, tasks:[
-        [90,"Project evidence block","Extend a full-stack, backend, automation, or data project and leave a clear artifact.","fullstack"],
-        [60,"Timed interview practice","Alternate coding screens, debugging drills, SQL cases, and project walkthroughs.","leetcode"],
-        [30,"Weekly review and next steps","Review due cards and logged errors. Choose next week's three highest-value gaps.","internal-review"]
-      ]},
-      { name:"Sunday", focus:"Rest and consolidation", minutes:0, tasks:[
-        [0,"Take the day off","No catch-up marathon. Optional: 15 minutes of relaxed flash recall only if you want it.","internal-optional"]
-      ]}
-    ];
+const themes=[
+ ["Baseline and retrieval","Establish your baseline and explain familiar concepts without notes.","Arrays, maps, JavaScript execution and SQL aggregation"],
+ ["Async JavaScript and joins","Make asynchronous behavior and relational joins easy to explain.","Two pointers, promises, the event loop and joins"],
+ ["HTTP, APIs and Python","Connect client, server and database behavior.","Binary search, HTTP, REST and Python iterators"],
+ ["Databases and CRUD","Build and explain dependable data-backed operations.","Trees, transactions, indexes and validation"],
+ ["Testing and debugging","Diagnose failures and distinguish major test layers.","Heaps, pytest, Playwright and SQL windows"],
+ ["TypeScript and orchestration","Explain typed boundaries and repeatable pipelines.","Graphs, narrowing, generics and idempotency"],
+ ["React and automation","Explain rendering, effects and maintainable tests.","Intervals, React state, fixtures and selectors"],
+ ["Backend systems","Reason about caching, queues and consistency.","Caching, queues, rate limits and pagination"],
+ ["Data pipelines","Turn project work into a clean technical story.","Batch work, quality checks, lineage and modeling"],
+ ["Timed problem solving","Perform within realistic limits while narrating.","25-minute screens, SQL cases and debugging"],
+ ["Interview simulations","Combine recall, coding and project stories.","Mixed problems, STAR stories and gap repair"],
+ ["Consolidation","Close high-value gaps and reduce load.","Targeted review, one final mock and portfolio polish"]
+];
+const weekdays=[
+ {name:"Monday",focus:"Algorithms and software recall",minutes:120,tasks:[[45,"LeetCode pattern practice","Solve one problem in Python. Write complexity and a recognition cue.","leetcode"],[60,"Source-backed question practice","Work through the current week's software questions before revealing answers.","internal-bank"],[15,"Closed-book recap","Explain one reviewed card aloud using answer, mechanism and example.","internal-cards"]]},
+ {name:"Tuesday",focus:"Data engineering and SQL",minutes:120,tasks:[[60,"Data Engineering Zoomcamp","Complete code or exercises aligned with this week's topic.","zoomcamp"],[45,"DataLemur SQL","Solve two easy questions or one medium without copying a solution.","datalemur"],[15,"Data concept explanation","Review the Data deck and explain one answer aloud.","internal-data"]]},
+ {name:"Wednesday",focus:"Algorithms, Python and full-stack recall",minutes:120,tasks:[[45,"LeetCode pattern practice","Solve one problem, then reproduce it from a blank editor.","leetcode"],[45,"Python depth block","Study one behavior and write a small proof example.","python"],[30,"Question-bank rapid recall","Answer sourced questions and log repeated misses.","internal-bank"]]},
+ {name:"Thursday",focus:"Pipeline building and SQL",minutes:120,tasks:[[60,"Zoomcamp project work","Implement, debug or document one commit-sized increment.","zoomcamp"],[45,"DataLemur SQL","Practice joins, aggregation, CTEs, windows or modeling.","datalemur"],[15,"Error-log update","Record what failed, why and the recognition cue.","internal-errors"]]},
+ {name:"Friday",focus:"Algorithms, systems and speaking",minutes:120,tasks:[[45,"LeetCode timed solve","Use a 35-minute cap and review reasoning for 10 minutes.","leetcode"],[45,"System design fundamentals","Sketch requirements, data flow, bottleneck and tradeoff.","systemBank"],[30,"Two spoken answers","Use the 90-second trainer and redo only the weaker response.","internal-speaking"]]},
+ {name:"Saturday",focus:"Portfolio evidence and realistic practice",minutes:180,tasks:[[90,"Project evidence block","Extend a project and leave code, tests, a diagram or README evidence.","fullstack"],[60,"Timed interview practice","Alternate coding, debugging, SQL and project walkthroughs.","top150"],[30,"Weekly review","Review due cards and choose next week's highest-value gaps.","internal-review"]]},
+ {name:"Sunday",focus:"Rest and consolidation",minutes:0,tasks:[[0,"Take the day off","No catch-up marathon. Optional relaxed recall only.","internal-optional"]]}
+];
+const adjustments={
+ 1:["Attempt one easy and one medium before solutions.","Prioritize scope, equality, objects and core SQL.","Set up the error log."],
+ 2:["Favor two pointers and sliding windows.","Focus on promises and joins.","Explain every answer aloud once."],
+ 3:["Favor linked lists and binary search.","Trace one HTTP request end to end.","Study generators and exceptions."],
+ 4:["Favor trees and recursion.","Add validation and a transaction.","Explain index tradeoffs."],
+ 5:["Favor heaps.","Write unit, integration and end-to-end tests.","Practice window functions."],
+ 6:["Favor graphs and traversal.","Practice TypeScript narrowing.","Explain idempotency and retries."],
+ 7:["Favor intervals and greedy reasoning.","Explain React rendering and effects.","Create stable selectors."],
+ 8:["Mix prior patterns under time limits.","Sketch caches, queues and rate limits.","Improve one backend project."],
+ 9:["Use medium problems from weak patterns.","Build one validated batch step.","Improve a project README."],
+ 10:["Run two 25-minute screens.","Narrate one SQL case.","Keep system design junior-sized."],
+ 11:["Run a complete mock.","Prepare bug, ownership and learning stories.","Repair repeated misses only."],
+ 12:["Use targeted review only.","Run one final mock early.","Reduce load before interviews."]
+};
+function card(id,week,category,level,bank,ref,q,direct,deep,example,trap){return{id:id,week:week,category:category,level:level,bank:bank,ref:ref,q:q,direct:direct,deep:deep,example:example,trap:trap};}
+const cards=[
+ card("js-equality",1,"Software","Junior","jsBank","mdnEquality","What is the difference between == and === in JavaScript?","Strict equality does not coerce operand types; loose equality may convert values before comparing them.","With ===, values of different types are unequal. With ==, JavaScript follows abstract equality conversion rules first. Use strict equality by default and loose equality only when the coercion is intentional.","0 == false is true after coercion; 0 === false is false because number and boolean are different types.","Saying only that === checks value and type hides object identity, NaN and signed-zero details."),
+ card("js-scope",1,"Software","Junior","jsBank","mdnClosure","What is lexical scope?","Names are resolved according to where code is written, not where a function is called.","A function is created inside a lexical environment. Name lookup starts there and proceeds through outer environments defined by source-code nesting.","A function returned by createCounter can still access createCounter's count binding.","Lexical scope is not determined by the function that happened to call the current function."),
+ card("hash-map",1,"Algorithms","Junior","leetcode","python","Why is hash-table lookup usually O(1), and when can it be worse?","A hash maps a key to a bucket, giving expected constant-time access with good distribution and capacity.","Performance depends on hashing, collisions and load factor. Heavy collision concentration can require many comparisons and produce linear worst-case behavior in a basic implementation.","A Python dictionary normally finds a key without scanning every entry.","O(1) is expected or amortized, not an unconditional worst-case guarantee."),
+ card("where-having",1,"Data","Junior","datalemur","postgres","How do WHERE and HAVING differ?","WHERE filters input rows before grouping; HAVING filters groups after aggregation.","Use WHERE for row-level conditions and HAVING for conditions involving group results such as COUNT or SUM.","WHERE status='paid' removes unpaid rows first; HAVING COUNT(*)>=5 keeps groups with five paid rows.","Putting every condition in HAVING can be invalid or unnecessarily expensive."),
+ card("closure",2,"Software","Junior","jsBank","mdnClosure","What is a closure?","A closure is a function together with access to the lexical environment in which it was created.","The function retains access to referenced outer bindings after the outer function returns. Closures support callbacks, private state and function factories.","createCounter returns an increment function that keeps using its own count binding.","Closures capture bindings, not frozen copies of all outer values."),
+ card("event-loop",2,"Software","Junior–Mid","jsBank","mdnLoop","How do tasks and microtasks affect JavaScript execution order?","After the current stack finishes, queued microtasks run before the next task.","Promise reactions and async-function continuations use microtasks. Timers normally schedule tasks. The runtime drains microtasks at defined checkpoints.","A resolved promise callback normally runs before a setTimeout callback scheduled in the same turn.","Promise callbacks do not run on a separate JavaScript thread."),
+ card("two-pointers",2,"Algorithms","Junior","leetcode","python","What signals that a two-pointer technique may fit?","The problem involves a sequence where two positions can move using an ordering or pairwise invariant.","Two pointers can replace nested search when input is sorted, when comparing ends, or when maintaining read and write positions. Each movement must safely discard candidates.","In sorted two-sum, move left right when the sum is too small and right left when it is too large.","Two pointers are not correct merely because an array has two ends; justify each move."),
+ card("joins",2,"Data","Junior","datalemur","postgres","When should you use INNER JOIN versus LEFT JOIN?","INNER JOIN keeps matching rows only; LEFT JOIN preserves every left row and fills unmatched right columns with NULL.","Choose based on the population you must retain. LEFT JOIN is necessary when unmatched left-side records still matter.","To find customers without orders, LEFT JOIN orders and filter where the order key is NULL.","A WHERE condition on the right table can accidentally turn a LEFT JOIN into inner-join behavior."),
+ card("await",2,"Software","Junior","jsBank","mdnPromise","What happens when an async function reaches await?","It pauses that function, returns a pending promise and schedules continuation after the awaited value settles.","await does not block the thread. Remaining code resumes through a later promise reaction while other synchronous work can continue.","While fetch is awaited, the event loop can process other work.","Awaiting independent operations sequentially can create unnecessary latency."),
+ card("http-idempotent",3,"Software","Junior","frontBank","mdnHttp","What does idempotent mean for an HTTP method?","Repeating the same request has the same intended effect on server state as sending it once.","Idempotency concerns intended effects, not identical response bodies. GET, PUT and DELETE are defined as idempotent; POST generally is not without application support.","Repeating the same PUT representation leaves the resource in the same intended state.","Repeated DELETE requests can return different statuses and still be idempotent."),
+ card("http-status",3,"Software","Junior","frontBank","mdnHttp","How do 400, 401, 403, 404 and 500 differ?","400 is a bad request, 401 needs valid authentication, 403 refuses permission, 404 cannot find the resource and 500 is an unexpected server failure.","Authentication establishes identity; authorization decides permission. Choose the status that matches the failure boundary.","A signed-in non-admin requesting an admin route normally receives 403.","401 does not mean authenticated-but-forbidden."),
+ card("binary-search",3,"Algorithms","Junior","leetcode","python","What invariant should binary search maintain?","The remaining interval must contain every still-possible answer after each comparison.","Choose inclusive or half-open bounds and update them consistently. Each comparison must discard only a region proven impossible.","With inclusive bounds, if a[mid] is too small, set left to mid+1.","Mixing boundary conventions causes skipped elements or infinite loops."),
+ card("generator",3,"Software","Junior","deBank","python","Why use a Python generator?","It produces values lazily instead of materializing the whole sequence.","Each next call resumes execution at the previous yield. This supports streams and large datasets but is commonly one-pass.","Process a large CSV record by record instead of building a list of every row.","Lazy production saves memory but does not make each operation cheap."),
+ card("transaction",4,"Data","Junior","datalemur","pgTx","Why use a database transaction?","It groups related statements into one unit that commits or rolls back together.","Transactions protect invariants when multi-step work fails or overlaps with concurrent work. Isolation controls which concurrent effects are visible.","Debit one account and credit another in the same transaction.","Transactions do not fix incorrect business logic, and long transactions increase contention."),
+ card("index",4,"Data","Junior","datalemur","pgIndex","What does a database index trade?","It can accelerate reads but costs storage and extra work on inserts, updates and deletes.","Indexes maintain searchable structures over selected columns. They are valuable for selective filters, joins and ordering, but the optimizer may still prefer a scan.","An index on users(email) can accelerate login lookup.","Indexing every column usually wastes space and slows writes."),
+ card("bfs-dfs",4,"Algorithms","Junior","leetcode","python","How do breadth-first and depth-first traversal differ?","BFS explores level by level with a queue; DFS follows a branch using recursion or a stack.","BFS finds shortest edge-count paths in unweighted graphs. DFS is natural for reachability, cycles and exhaustive branch exploration.","Finding the closest matching node in an unweighted graph is a BFS use.","DFS does not guarantee the shortest unweighted path."),
+ card("validation",4,"Software","Junior","frontBank","mdnHttp","Where should API input validation happen?","Validate untrusted input at the application boundary and keep database constraints as a final guard.","Boundary validation gives clear client errors before invalid data reaches business logic. Critical invariants should still be enforced by the database.","Reject malformed input in the API and keep a UNIQUE constraint for a unique field.","Client-side validation alone is not a security or integrity boundary."),
+ card("test-layers",5,"QA","Junior","sdetBank","pytest","How do unit, integration and end-to-end tests differ?","Unit tests isolate small behavior, integration tests exercise collaborating pieces and end-to-end tests validate complete workflows.","The layers trade scope for speed and diagnostic precision. Use focused tests for most behavior and fewer end-to-end tests for critical journeys.","Test a parser as a unit, an API with a test database as integration and signup through a browser as end to end.","Define what is real and replaced; labels alone can be ambiguous."),
+ card("flaky",5,"QA","Junior–Mid","sdetBank","playwright","What makes an automated test flaky?","It passes and fails without a relevant product change because some input or dependency is uncontrolled.","Typical causes include timing assumptions, shared state, unstable selectors, network dependencies and order dependence. Find the nondeterministic boundary instead of hiding it.","Replace a fixed sleep with an assertion that waits for a visible ready state.","Retries can conceal a real race or product defect."),
+ card("window",5,"Data","Junior","datalemur","postgres","How is a window function different from GROUP BY?","GROUP BY collapses rows; a window function computes across related rows while preserving each row.","OVER defines the partition and calculation order, enabling ranks, running totals and previous-row comparisons without losing detail.","ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY created_at) numbers each customer's orders.","Window ordering does not guarantee final result order without an outer ORDER BY."),
+ card("heap",5,"Algorithms","Junior","leetcode","python","When is a heap useful?","Use it when you repeatedly need the smallest or largest item, a priority queue or a running top-k set.","A binary heap gives constant-time root access and logarithmic insertion and removal. A size-k heap avoids sorting all values.","Keep a min-heap of size k to track the k largest values.","A heap is not fully sorted; only its root has the guaranteed extreme."),
+ card("unknown-any",6,"Software","Junior","jsBank","typescript","How do TypeScript unknown and any differ?","Both accept any value, but unknown requires narrowing while any disables most checking.","unknown is appropriate at uncertain boundaries because operations are rejected until checks establish a safer type. any lets unsafe assumptions spread.","Treat parsed external data as unknown and check its shape before field access.","A type assertion is not runtime validation."),
+ card("narrowing",6,"Software","Junior","jsBank","typescript","What is type narrowing?","It uses runtime checks and control flow to refine a broad TypeScript type.","typeof, instanceof, discriminant fields and predicates let the compiler determine which operations are safe in each branch.","After typeof value==='string', string methods are safe in that branch.","Truthiness checks can accidentally exclude valid values such as 0 or an empty string."),
+ card("generics",6,"Software","Junior–Mid","jsBank","typescript","What problem do generics solve?","They make reusable code preserve relationships between input and output types.","A type parameter represents a caller-selected type, avoiding information loss to any or broad unions.","first<T>(items:T[]) returns T or undefined and preserves the element type.","A generic used only once may add complexity without expressing a relationship."),
+ card("pipeline-idempotent",6,"Data","Junior–Mid","deBank","zoomcamp","Why should a scheduled pipeline step be idempotent?","Rerunning the same logical input should not duplicate or corrupt the intended output.","Schedulers retry and engineers backfill. Stable keys, partition replacement, merges or deduplication make reruns safe.","Replace a daily partition rather than blindly appending the same rows again.","Define idempotency around a logical input; output may still change when source data changes."),
+ card("react-render",7,"Software","Junior","reactBank","reactRender","What causes a React component to render?","Initial mounting and queued updates to state can trigger rendering; parent and consumed-context updates can also cause work.","Rendering means React calls component functions to calculate the next UI, then commits only necessary host changes.","Calling a state setter queues another render.","Rendering does not mean rewriting the entire DOM."),
+ card("react-key",7,"Software","Junior","reactBank","reactLists","Why does React need stable keys for lists?","Keys let React match items between renders so identity and local state stay with the correct item.","Keys should be unique among siblings and stable across insertion, removal and reordering. Persistent record IDs are usually appropriate.","Using todo.id preserves a row's edit state when a new item is inserted.","Array indexes are risky when order can change."),
+ card("react-effect",7,"Software","Junior–Mid","reactBank","reactEffect","When should you use a React effect?","Use an effect to synchronize with an external system after rendering.","Effects fit subscriptions, connections, timers and imperative APIs. Values derived only from current props and state usually belong in render.","Connect to a chat room when roomId changes and disconnect in cleanup.","Using effects for every derived value creates extra renders and synchronization bugs."),
+ card("selectors",7,"QA","Junior","sdetBank","playwright","What makes an end-to-end selector resilient?","Prefer roles, labels and names or an explicit test contract over layout-dependent selectors.","User-facing selectors survive CSS and DOM restructuring better than long paths or positional selectors.","Use getByRole('button',{name:'Save'}) instead of div:nth-child(3)>button.","Text can still be fragile when it is duplicated or frequently changed."),
+ card("cache",8,"System","Junior","systemBank","systemBank","What is the hardest part of caching?","Keeping cached data acceptably fresh and defining misses and failures.","Define the key, owner, expiration, invalidation, eviction and fallback before adding a cache.","Cache a product description briefly and invalidate it after an administrative edit.","A cache changes application consistency behavior; it is not merely faster storage."),
+ card("queue",8,"System","Junior","systemBank","systemBank","Why put work on a queue?","It decouples producers from consumers, absorbs bursts and enables asynchronous processing and retries.","The design must address duplicate delivery, ordering, retries, dead-letter handling and observability.","An upload API enqueues thumbnail generation instead of holding the request open.","Consumers should normally be safe if a message is delivered more than once."),
+ card("rate-limit",8,"System","Junior","systemBank","systemBank","What does rate limiting protect?","It protects finite capacity and reduces abuse by restricting operations per identity or time window.","Choose an identity key, algorithm, limit, time basis and response. Token bucket permits controlled bursts.","Limit password attempts per account and IP and return 429 with retry guidance.","Rate limiting does not replace authentication or authorization."),
+ card("pagination",8,"System","Junior–Mid","systemBank","systemBank","Why can cursor pagination be safer than offset pagination?","A cursor continues from a stable sort position, reducing skips and duplicates as data changes.","Offset supports page numbers but large offsets can be slow and concurrent writes shift positions. Cursor pagination needs deterministic unique ordering.","Use created_at plus id as a stable cursor.","A cursor based only on a non-unique field can still repeat or omit rows."),
+ card("batch-stream",9,"Data","Junior","deBank","zoomcamp","How do batch and streaming pipelines differ?","Batch processes bounded data periodically; streaming processes ongoing events with lower latency.","Streaming adds event time, late arrival, ordering, state and replay concerns. Batch is simpler when scheduled freshness is enough.","Nightly revenue is batch; near-real-time fraud detection consumes a stream.","Streaming is not automatically better; lower latency adds complexity."),
+ card("data-quality",9,"Data","Junior","deBank","zoomcamp","What data-quality checks belong near a pipeline boundary?","Check schema, required values, uniqueness, ranges, references, volume and freshness.","Bad data should fail, quarantine or trigger a visible warning rather than load silently. Check both rows and dataset-level changes.","Reject a file with missing required columns and alert on an abnormal row-count drop.","Schema validity does not prove semantic correctness."),
+ card("lineage",9,"Data","Junior","deBank","zoomcamp","What is data lineage useful for?","It records where data came from, how it changed and what depends on it.","Lineage supports impact analysis, incident debugging, governance and trust across datasets and transformations.","Before changing a source column, lineage identifies affected models and dashboards.","Manual lineage that is not maintained becomes misleading."),
+ card("star-schema",9,"Data","Junior–Mid","deBank","postgres","What is a star schema?","It places measurable events in a fact table connected to descriptive dimensions.","Facts contain measures and foreign keys; dimensions describe entities such as customer, product and date. Grain must be explicit.","An order_line fact links to product, customer and date dimensions.","Mixing grains in one fact table causes double counting."),
+ card("sliding-window",10,"Algorithms","Junior","leetcode","python","What recognition cue suggests a sliding-window solution?","Look for a contiguous range whose state can be updated as either boundary moves.","Fixed windows maintain a size; variable windows expand and shrink while preserving a condition, avoiding recomputation of every subarray.","Find the longest substring without repeats by moving the left boundary past duplicates.","Sliding windows usually do not fit non-contiguous selections."),
+ card("dynamic-programming",10,"Algorithms","Junior–Mid","top150","python","What suggests a dynamic-programming solution?","The problem has overlapping subproblems and an answer built from smaller states.","Define the state, recurrence, base cases and evaluation order before coding. Memoization is top-down; tabulation is bottom-up.","For climbing stairs, ways[i]=ways[i-1]+ways[i-2].","Do not start with a table before defining what one state means."),
+ card("mocks",10,"QA","Junior","sdetBank","pytest","What is the difference between a mock, stub and fake?","A stub returns controlled data, a mock verifies interactions and a fake is a simplified working implementation.","Terminology varies, so explain the behavior replaced and why. Doubles help at costly or nondeterministic boundaries.","Stub a gateway response, mock an audit call and use an in-memory repository as a fake.","Over-mocking can make tests pass while the real integration is broken."),
+ card("api-test",10,"QA","Junior","sdetBank","playwright","What should an API test validate besides the status code?","Validate the response contract, important data, side effects, errors and relevant headers.","Cover happy paths, invalid inputs, authorization, boundaries and persistence with controlled independent data.","After POST /users, assert 201, response fields, persistence and duplicate-email behavior.","A 200 response can still contain the wrong payload or omit the promised state change."),
+ card("replication-sharding",11,"System","Junior–Mid","systemBank","systemBank","How do replication and sharding solve different problems?","Replication copies data across nodes; sharding divides different data across nodes.","Replication improves read capacity and availability but adds consistency concerns. Sharding increases total capacity but complicates routing and cross-shard work.","Read replicas serve reports while customer-based shards divide the primary dataset.","Replicas are not independent shards, and shards still need redundancy."),
+ card("eventual-consistency",11,"System","Junior","systemBank","systemBank","What is eventual consistency?","Replicas or derived views may temporarily disagree after a write but converge later.","It trades immediate guarantees for availability, latency or asynchronous propagation. The product must tolerate stale reads.","A follower count may lag briefly after a follow event.","Eventual does not mean unbounded or unreliable; convergence still needs a mechanism."),
+ card("project-story",11,"Behavioral","Junior","behaviorBank","behaviorBank","How should you explain a personal software project?","Lead with the problem, your responsibility, architecture, hardest decision and result.","Make your reasoning visible: challenge, alternatives, validation and what you would improve. Keep setup brief.","Use an Electron, Python or Rust project and point to a bug fixed or workflow improved.","Do not spend the answer listing libraries without decisions or impact."),
+ card("bug-story",11,"Behavioral","Junior","behaviorBank","behaviorBank","Tell me about a difficult bug you diagnosed.","Describe the symptom, impact, evidence, hypotheses, root cause, fix and prevention.","A strong answer demonstrates disciplined investigation rather than luck and explains how the fix was verified.","Choose a real project bug where logs or a minimal reproduction changed your understanding.","Avoid saying only that you searched online or changed code until it worked."),
+ card("ownership",11,"Behavioral","Junior","behaviorBank","behaviorBank","What demonstrates ownership in a junior-level answer?","Notice a meaningful problem, clarify the goal, complete the work and validate the outcome.","Show initiative within appropriate boundaries, communicate risk, ask for context and follow through after implementation.","Automate a repeated manual step and verify that the new workflow remains reliable.","Ownership does not mean working alone or refusing help."),
+ card("learning",11,"Behavioral","Junior","behaviorBank","behaviorBank","Tell me about a time you learned something quickly.","State the goal, identify high-value knowledge, apply it immediately and show the result.","Interviewers want evidence of learning velocity, not a list of tutorials. Explain decomposition, testing and correction.","Describe learning enough Rust and Slint to implement a specific project feature.","Do not claim mastery after brief exposure."),
+ card("failure",12,"Behavioral","Junior","behaviorBank","behaviorBank","How should you answer a question about failure?","Choose a real mistake, take responsibility and explain the changed behavior that followed.","Spend more time on diagnosis, repair and prevention than on excuses or excessive self-criticism.","A rushed change caused a regression; you restored behavior, added a test and changed the checklist.","Avoid a disguised strength such as caring too much."),
+ card("conflict",12,"Behavioral","Junior","behaviorBank","behaviorBank","How should you discuss a technical disagreement?","Focus on the shared goal, evidence, respectful communication and decision process.","Explain both constraints fairly, propose a test or criterion and support the final direction.","Compare two approaches with a small prototype and decide using maintainability evidence.","Do not portray the other person as incompetent or make the story about winning."),
+ card("unknown",12,"Behavioral","Junior","behaviorBank","behaviorBank","What should you do when you cannot fully answer a technical question?","State what you know, clarify uncertainty, reason from fundamentals and explain verification.","Separate confirmed facts from hypotheses. Interviewers can evaluate honest problem solving even when recall is incomplete.","Say you do not recall an exact method name, then describe the operation and where you would confirm it.","Stopping at 'I don't know' wastes the chance to demonstrate reasoning."),
+ card("null-sql",12,"Data","Junior","datalemur","postgres","How does SQL NULL affect comparisons?","NULL represents unknown or missing, so ordinary comparisons produce unknown rather than true.","Use IS NULL or IS NOT NULL. Three-valued logic affects WHERE, joins and NOT IN behavior.","WHERE deleted_at=NULL matches nothing; use IS NULL.","NOT IN can surprise when its subquery contains NULL; NOT EXISTS is often safer.")
+];
+const resources=[
+ ["GreatFrontEnd JavaScript","Question bank","Software","Curated JavaScript interview questions with explanations and coding practice.","jsBank"],
+ ["GreatFrontEnd React","Question bank","Software","Public React interview-question collection.","reactBank"],
+ ["Front End Interview Handbook","Question bank","Software","Frontend quiz, coding and system-design preparation.","frontBank"],
+ ["LeetCode 75","Question bank","Algorithms","A contained set of essential coding-interview problems.","leetcode"],
+ ["Top Interview 150","Question bank","Algorithms","A broader set of classic interview problems.","top150"],
+ ["DataLemur","Question bank","Data","Company-tagged SQL and data interview problems.","datalemur"],
+ ["Data Engineering Questions","Question bank","Data","Hands-on data-engineering question collection.","deBank"],
+ ["System Design Primer","Question bank","System","Open-source study guide, questions, solutions and Anki decks.","systemBank"],
+ ["SDET Interview Catalog","Question bank","QA","Testing and automation question collection.","sdetBank"],
+ ["Tech Interview Handbook","Question bank","Behavioral","Common software-engineering behavioral prompts.","behaviorBank"],
+ ["MDN JavaScript Guide","Technical reference","Software","Authoritative JavaScript and browser documentation.","mdn"],
+ ["TypeScript Handbook","Technical reference","Software","Official narrowing and type-system guidance.","typescript"],
+ ["React Documentation","Technical reference","Software","Official rendering, state and effect explanations.","reactRender"],
+ ["Python Documentation","Technical reference","Algorithms","Official language tutorial and reference.","python"],
+ ["PostgreSQL Documentation","Technical reference","Data","Official query, transaction and indexing documentation.","postgres"],
+ ["Playwright Best Practices","Technical reference","QA","Official guidance for reliable browser tests.","playwright"],
+ ["pytest Documentation","Technical reference","QA","Official fixture and testing documentation.","pytest"],
+ ["Data Engineering Zoomcamp","Course","Data","Project-based pipeline and warehouse course.","zoomcamp"],
+ ["Full Stack Open","Course","Software","React, Node, APIs, testing and databases.","fullstack"]
+];
 
-    const weekAdjustments = {
-      1:["Baseline: attempt one easy and one medium before using solutions.","Focus JSDen on scope, closures, equality, objects, arrays, and HTTP basics.","Set up Zoomcamp materials and review SQL SELECT/WHERE/GROUP BY."],
-      2:["Favor two-pointers and sliding-window problems.","Use JSDen for promises, async/await, the event loop, and React state.","Practice INNER/LEFT JOIN and aggregation."],
-      3:["Favor linked lists and binary search.","Trace one request from browser to API to database and back.","Study Python exceptions, iterators/generators, and testable functions."],
-      4:["Favor trees and recursion.","Add CRUD, validation, one transaction, and useful error responses to a small API.","Saturday: implement one studied algorithm in JavaScript, with tests."],
-      5:["Favor heaps and priority queues.","Write one unit test, one integration/API test, and one Playwright end-to-end test.","Practice SQL window functions and explain partitions versus groups."],
-      6:["Favor graphs, BFS, and DFS.","Use TypeScript narrowing, generics, utility types, and typed API boundaries.","Explain idempotency, retries, scheduling, and pipeline observability."],
-      7:["Favor intervals and greedy reasoning.","Explain React render triggers, effects, memoization, and state ownership.","Create stable selectors, fixtures, and one mocked failure path."],
-      8:["Mix prior patterns under time limits.","Sketch caching, queues, auth boundaries, rate limits, and consistency tradeoffs.","Saturday: implement one medium algorithm in JavaScript, with tests."],
-      9:["Use mostly medium problems from weak patterns.","Build one batch pipeline step with validation and a clear rerun story.","Improve a README with architecture, decisions, tests, and measurable outcomes."],
-      10:["Run at least two 25-minute coding screens.","Practice a SQL case and a debugging session while narrating every decision.","Keep system design junior-sized: requirements, API, data model, bottleneck, tradeoff."],
-      11:["Run a full 45–60 minute technical mock.","Prepare five project stories: hardest bug, tradeoff, ownership, learning, collaboration.","Repair only repeated misses from the error log."],
-      12:["Use targeted review, not new topics.","Run one final mock early in the week and taper afterward.","Saturday: optional JavaScript implementation only if no interview is imminent."]
-    };
-
-    const resources = [
-      ["JSDen","Core","Software","JavaScript interview questions and coding challenges covering React, Angular, Node.js, and TypeScript.","jsden"],
-      ["LeetCode 75","Core","Algorithms","A contained pattern-based problem list intended for roughly one to three months of interview prep.","leetcode"],
-      ["DataLemur SQL","Core","Data","SQL interview problems with difficulty filters. Use for active query practice, not only reading solutions.","datalemur"],
-      ["Data Engineering Zoomcamp","Core","Data","A free, project-based course covering production-oriented pipelines and modern data engineering tools.","zoomcamp"],
-      ["System Design Primer","Core","Software","A structured reference for requirements, scalability concepts, tradeoffs, and common system components.","system"],
-      ["Python Tutorial","Core","Algorithms","Official language reference for targeted refreshers. Use it to close specific gaps rather than restart Python.","python"],
-      ["Full Stack Open","Reference","Software","University of Helsinki course on React, Node.js, APIs, testing, databases, GraphQL, and TypeScript.","fullstack"],
-      ["MDN JavaScript Guide","Reference","Software","Authoritative explanations of JavaScript language behavior and browser-facing concepts.","mdn"],
-      ["TypeScript Handbook","Reference","Software","Official guide for narrowing, generics, utility types, structural typing, and TS-specific behavior.","typescript"],
-      ["Node.js Learn","Reference","Software","Official Node.js learning material for runtime, async work, HTTP, files, modules, and diagnostics.","node"],
-      ["Playwright for Python","Reference","QA","Official setup and testing documentation for browser automation with pytest integration.","playwright"],
-      ["pytest Docs","Reference","QA","Official reference for assertions, fixtures, parametrization, mocking, and test organization.","pytest"],
-      ["SQLBolt","Reference","Data","Fast interactive SQL refreshers when a syntax gap is blocking DataLemur progress.","sqlbolt"],
-      ["pandas Getting Started","Reference","Data","Official guides for tabular manipulation, missing data, joins, reshaping, and time series.","pandas"],
-      ["roadmap.sh","Reference","Planning","Use the backend or data engineer roadmap as a gap checklist, not as another course to finish.","roadmap"]
-    ];
-
-    const prompts = [
-      "What happens in JavaScript when an async function reaches await?",
-      "Explain the event loop to someone who already knows how to write promises.",
-      "When would you choose a SQL JOIN over a subquery or CTE?",
-      "What is an index, and why can adding too many indexes hurt?",
-      "Describe unit, integration, and end-to-end tests using one of your projects.",
-      "How would you debug an API that is fast locally but slow in production?",
-      "Explain idempotency and why it matters in a data pipeline or API.",
-      "What is the difference between TypeScript's unknown and any?",
-      "How do React state updates cause a component to render?",
-      "Explain a hash map, its typical complexity, and a collision.",
-      "How would you design pagination for an API whose data changes often?",
-      "What makes an automated test flaky, and how would you investigate it?",
-      "Explain normalization and when denormalization is worth considering.",
-      "Walk through a difficult bug you diagnosed in a personal software project.",
-      "How would you validate data quality before loading a downstream table?"
-    ];
-
-    const baseCards = [
-      {id:"w1-lexical-scope",week:1,category:"Software",front:"What is lexical scope in JavaScript?",back:"A function can access variables based on where the function was defined in source code, not where it is called. The scope chain is determined during creation and enables closures.",ref:"mdn"},
-      {id:"w1-hash-map",week:1,category:"Algorithms",front:"Why is hash-map lookup usually O(1), and when can it degrade?",back:"A hash function maps a key to a bucket, so access is constant on average. Poor distribution or many collisions can make operations approach O(n), depending on the collision strategy.",ref:"leetcode"},
-      {id:"w1-where-having",week:1,category:"Data",front:"What is the difference between SQL WHERE and HAVING?",back:"WHERE filters rows before grouping and aggregation. HAVING filters groups after GROUP BY and can reference aggregate results.",ref:"sqlbolt"},
-      {id:"w1-coercion",week:1,category:"Software",front:"Why is === normally preferred over == in JavaScript?",back:"Strict equality compares without type coercion. Loose equality applies conversion rules that can create surprising matches, so === is usually easier to reason about.",ref:"mdn"},
-
-      {id:"w2-closure",week:2,category:"Software",front:"What is a closure?",back:"A closure is a function together with access to its lexical environment. It lets the function retain variables from its defining scope after that outer function has returned.",ref:"mdn"},
-      {id:"w2-event-loop",week:2,category:"Software",front:"What happens after an awaited promise settles?",back:"The async function's continuation is queued as a microtask. Microtasks run after the current call stack finishes and before the next task such as a timer callback.",ref:"mdn"},
-      {id:"w2-left-join",week:2,category:"Data",front:"When should you use a LEFT JOIN instead of an INNER JOIN?",back:"Use LEFT JOIN when every row from the left table must remain, even without a match. Missing right-side values appear as NULL.",ref:"sqlbolt"},
-      {id:"w2-sliding-window",week:2,category:"Algorithms",front:"What recognition cue suggests a sliding-window solution?",back:"Look for a contiguous range plus a condition that can be updated when either boundary moves. The window avoids recomputing each range from scratch.",ref:"leetcode"},
-
-      {id:"w3-idempotent-http",week:3,category:"Software",front:"What does idempotent mean for an HTTP method?",back:"Repeating the same request has the same intended server effect as making it once. GET, PUT, and DELETE are defined as idempotent; POST generally is not.",ref:"node"},
-      {id:"w3-status",week:3,category:"Software",front:"How do 400, 401, 403, 404, and 500 differ?",back:"400: invalid request. 401: authentication is required or failed. 403: authenticated but not allowed. 404: resource not found. 500: unexpected server failure.",ref:"node"},
-      {id:"w3-generator",week:3,category:"Software",front:"What advantage does a Python generator provide?",back:"It yields values lazily instead of materializing the entire sequence. That can reduce memory use and enables streaming pipelines, at the cost of one-pass behavior in many cases.",ref:"python"},
-      {id:"w3-binary-search",week:3,category:"Algorithms",front:"What must remain true during binary search?",back:"Maintain an invariant describing where the answer can still exist. Each comparison must discard a portion that cannot contain the answer while keeping boundary updates consistent.",ref:"leetcode"},
-
-      {id:"w4-transaction",week:4,category:"Data",front:"Why use a database transaction?",back:"A transaction groups operations into one atomic unit. Either the intended set commits or it rolls back, protecting invariants when failures or concurrent work occur.",ref:"fullstack"},
-      {id:"w4-index",week:4,category:"Data",front:"What does a database index trade?",back:"It speeds reads by maintaining a searchable structure, but consumes storage and adds work to inserts, updates, and deletes. Index columns used by selective filters, joins, or ordering.",ref:"fullstack"},
-      {id:"w4-tree-traversal",week:4,category:"Algorithms",front:"How do breadth-first and depth-first tree traversal differ?",back:"BFS explores level by level with a queue. DFS follows a branch using recursion or a stack. BFS helps with shortest unweighted paths; DFS is natural for recursive structure and exhaustive branch work.",ref:"leetcode"},
-      {id:"w4-validation",week:4,category:"Software",front:"Where should API input validation happen?",back:"Validate at the boundary before business logic or persistence. Return a clear client error, while database constraints remain a final integrity guard.",ref:"fullstack"},
-
-      {id:"w5-test-layers",week:5,category:"QA",front:"How do unit, integration, and end-to-end tests differ?",back:"Unit tests isolate a small behavior. Integration tests exercise collaborating components or boundaries. End-to-end tests validate a real user workflow across the assembled system.",ref:"pytest"},
-      {id:"w5-flaky",week:5,category:"QA",front:"What usually makes an automated test flaky?",back:"Common causes include timing assumptions, shared state, unstable selectors, uncontrolled network behavior, random data, and order dependence. Reproduce and identify the nondeterministic boundary before adding retries.",ref:"playwright"},
-      {id:"w5-window",week:5,category:"Data",front:"How is a SQL window function different from GROUP BY?",back:"GROUP BY collapses rows into one result per group. A window function calculates across related rows while preserving each original row.",ref:"datalemur"},
-      {id:"w5-heap",week:5,category:"Algorithms",front:"When is a heap useful in an interview problem?",back:"Use a heap when you repeatedly need the smallest or largest item, maintain a top-k set, or process items by priority. Insert and removal are typically O(log n).",ref:"leetcode"},
-
-      {id:"w6-unknown-any",week:6,category:"Software",front:"How do TypeScript unknown and any differ?",back:"any disables most checking and permits arbitrary operations. unknown accepts any value but requires narrowing before use, so it preserves type safety at uncertain boundaries.",ref:"typescript"},
-      {id:"w6-generics",week:6,category:"Software",front:"What problem do TypeScript generics solve?",back:"Generics express relationships between types while preserving specific information. They let reusable code remain type-safe without falling back to broad unions or any.",ref:"typescript"},
-      {id:"w6-pipeline-idempotency",week:6,category:"Data",front:"Why should a scheduled pipeline step be idempotent?",back:"Retries and reruns should not duplicate or corrupt output. An idempotent step can safely process the same logical input again and produce the same intended state.",ref:"zoomcamp"},
-      {id:"w6-bfs-dfs",week:6,category:"Algorithms",front:"When would BFS be preferable to DFS in a graph?",back:"BFS is preferable for the shortest path in an unweighted graph or level-order exploration. DFS is often simpler for reachability, cycle detection, or exhaustive branch traversal.",ref:"leetcode"},
-
-      {id:"w7-react-render",week:7,category:"Software",front:"What commonly causes a React component to render again?",back:"Its state changes, its parent renders, or a consumed context value changes. React then reconciles the new element tree with the previous one before committing necessary updates.",ref:"fullstack"},
-      {id:"w7-effect",week:7,category:"Software",front:"What is a useful rule for React effects?",back:"Use an effect to synchronize with an external system, not to derive values that can be calculated during render. Declare dependencies honestly and clean up subscriptions or timers.",ref:"fullstack"},
-      {id:"w7-selectors",week:7,category:"QA",front:"What makes an end-to-end test selector resilient?",back:"Prefer user-facing roles, accessible names, labels, or an intentional test id. Avoid brittle CSS paths and selectors tied to incidental layout.",ref:"playwright"},
-      {id:"w7-greedy",week:7,category:"Algorithms",front:"What must you justify in a greedy algorithm?",back:"Show that the locally best choice can be part of an optimal solution and does not block a better future result. An exchange argument or maintained invariant is common.",ref:"leetcode"},
-
-      {id:"w8-cache",week:8,category:"Software",front:"What is the hard part of caching?",back:"Keeping cached data acceptably fresh. Define ownership, expiration, invalidation, and behavior during a miss or cache failure before adding the cache.",ref:"system"},
-      {id:"w8-queue",week:8,category:"Software",front:"Why put work on a queue?",back:"A queue decouples producers from slower or failure-prone consumers, absorbs bursts, and enables retries. It adds operational complexity and requires duplicate-safe processing.",ref:"system"},
-      {id:"w8-rate-limit",week:8,category:"Software",front:"What does rate limiting protect?",back:"It protects finite capacity and discourages abuse by limiting requests per identity or time window. The design must define the key, algorithm, limits, and client response.",ref:"system"},
-      {id:"w8-consistency",week:8,category:"Data",front:"What is eventual consistency?",back:"Replicas or derived views may temporarily disagree after a write but converge later. It improves availability or performance when the product can tolerate short-lived stale reads.",ref:"system"},
-
-      {id:"w9-batch-stream",week:9,category:"Data",front:"How do batch and streaming pipelines differ?",back:"Batch processes bounded collections on a schedule. Streaming processes ongoing events with lower latency and more complex ordering, state, replay, and operational concerns.",ref:"zoomcamp"},
-      {id:"w9-quality",week:9,category:"Data",front:"What data-quality checks belong near a pipeline boundary?",back:"Check schema, required fields, uniqueness, ranges, referential rules, volume changes, and freshness. Quarantine or fail predictably instead of silently loading bad data.",ref:"zoomcamp"},
-      {id:"w9-lineage",week:9,category:"Data",front:"What is data lineage useful for?",back:"Lineage records where data came from, how it changed, and what consumes it. It supports impact analysis, debugging, governance, and trust in reported results.",ref:"zoomcamp"},
-      {id:"w9-project-story",week:9,category:"Behavioral",front:"What should a concise project walkthrough include?",back:"Problem and users, your responsibility, architecture or approach, hardest decision, validation or testing, measurable result, and what you would improve next.",ref:"roadmap"},
-
-      {id:"w10-requirements",week:10,category:"Software",front:"What should you clarify before sketching a system design?",back:"Clarify users, core actions, scale, latency, consistency, availability, security, and explicit non-goals. These requirements determine which tradeoffs matter.",ref:"system"},
-      {id:"w10-pagination",week:10,category:"Software",front:"Why can cursor pagination be safer than offset pagination?",back:"A stable cursor continues from a known sort position, so inserts and deletes are less likely to cause duplicates or skipped rows. Offset pagination is simpler but can become slow or inconsistent on changing data.",ref:"system"},
-      {id:"w10-debug",week:10,category:"QA",front:"What is a disciplined debugging sequence?",back:"Reproduce, reduce the scope, collect evidence, form one hypothesis, run a discriminating test, fix the cause, and add protection against regression.",ref:"pytest"},
-      {id:"w10-coding-talk",week:10,category:"Algorithms",front:"What should you say during a timed coding screen?",back:"Clarify inputs and constraints, state a simple approach, improve it, name complexity, code in small steps, test normal and edge cases, and correct mistakes openly.",ref:"leetcode"},
-
-      {id:"w11-star",week:11,category:"Behavioral",front:"What belongs in a strong STAR answer?",back:"Situation and task should be brief. Spend most time on your specific actions, decisions, and measurable result, then add what you learned when useful.",ref:"roadmap"},
-      {id:"w11-bug-story",week:11,category:"Behavioral",front:"How should you tell a difficult debugging story?",back:"Describe the symptom, impact, evidence gathered, hypotheses eliminated, root cause, fix, verification, and prevention. Make your own reasoning visible.",ref:"roadmap"},
-      {id:"w11-tradeoff",week:11,category:"Behavioral",front:"How do you explain an engineering tradeoff?",back:"Name the competing goals, constraints, alternatives, decision criteria, chosen option, downside accepted, and evidence that the choice worked.",ref:"roadmap"},
-      {id:"w11-ownership",week:11,category:"Behavioral",front:"What demonstrates ownership in a junior-level story?",back:"Not seniority: noticing a problem, clarifying the goal, communicating risk, completing the work, validating the result, and learning from the outcome.",ref:"roadmap"},
-
-      {id:"w12-complexity",week:12,category:"Algorithms",front:"What does Big O communicate in an interview?",back:"It describes how resource use grows with input size, ignoring constant factors and lower-order terms. State both time and space and identify what n represents.",ref:"leetcode"},
-      {id:"w12-gap",week:12,category:"Behavioral",front:"How should you handle a technical question you cannot fully answer?",back:"State what you know, clarify the unknown, reason from fundamentals, propose how you would verify it, and avoid bluffing. Interviewers can evaluate the process.",ref:"roadmap"},
-      {id:"w12-project",week:12,category:"Behavioral",front:"What evidence makes a personal project interview-ready?",back:"A clear problem, runnable code, focused README, architecture explanation, meaningful tests, decisions and tradeoffs, and a short demonstration of the hardest part.",ref:"roadmap"},
-      {id:"w12-rest",week:12,category:"Behavioral",front:"What is the final-week study rule?",back:"Review known material and repeated misses; do not start a broad new curriculum. Run one final mock early, then reduce load so recall is available on interview day.",ref:"roadmap"}
-    ];
-
-    let selectedWeek = 1;
-    let selectedDay = 0;
-    let timerSeconds = 90;
-    let timerHandle = null;
-    const progressKey = "interview-helper-progress-v1";
-    const startKey = "interview-helper-start-v1";
-    const srsKey = "interview-helper-srs-v1";
-    const customCardsKey = "interview-helper-custom-cards-v1";
-    const errorsKey = "interview-helper-errors-v1";
-    let completed = JSON.parse(localStorage.getItem(progressKey) || localStorage.getItem("dalton-study-progress-v1") || "{}");
-    let srsState = JSON.parse(localStorage.getItem(srsKey) || "{}");
-    let customCards = JSON.parse(localStorage.getItem(customCardsKey) || "[]");
-    let errorLog = JSON.parse(localStorage.getItem(errorsKey) || "[]");
-    let reviewQueue = [];
-    let currentCard = null;
-
-    function allCards() { return [...baseCards, ...customCards]; }
-    function stateFor(card) { return srsState[card.id] || {due:0,interval:0,ease:2.5,reps:0,lapses:0,reviews:0}; }
-    function isDue(card) { return stateFor(card).due <= Date.now(); }
-    function intervalLabel(days) { return days < 1 ? "10 minutes" : `${days} day${days === 1 ? "" : "s"}`; }
-    function previewIntervals(card) {
-      const s = stateFor(card);
-      return {
-        hard: s.reps === 0 ? 1 : Math.max(1, Math.ceil(s.interval * 1.2)),
-        good: s.reps === 0 ? 1 : s.reps === 1 ? 3 : Math.max(2, Math.ceil(s.interval * s.ease)),
-        easy: s.reps === 0 ? 4 : Math.max(4, Math.ceil(s.interval * s.ease * 1.3))
-      };
-    }
-    function cardsForFilter(filter) {
-      const cards = allCards();
-      if (filter === "all") return cards;
-      if (filter === "data") return cards.filter(card => card.category === "Data" && isDue(card));
-      if (filter === "software") return cards.filter(card => ["Software","Algorithms"].includes(card.category) && isDue(card));
-      if (filter === "qa") return cards.filter(card => card.category === "QA" && isDue(card));
-      if (filter === "due") return cards.filter(isDue);
-      return cards.filter(card => card.week === selectedWeek && isDue(card));
-    }
-    function rebuildReviewQueue() {
-      reviewQueue = cardsForFilter(document.getElementById("deckFilter").value)
-        .sort((a,b) => stateFor(a).due - stateFor(b).due || a.id.localeCompare(b.id));
-      showNextCard();
-    }
-    function updateCardStats() {
-      const cards = allCards();
-      document.getElementById("dueCount").textContent = cards.filter(isDue).length;
-      document.getElementById("learnedCount").textContent = cards.filter(card => stateFor(card).reviews > 0).length;
-      document.getElementById("cardTotal").textContent = cards.length;
-    }
-    function showNextCard() {
-      currentCard = reviewQueue.shift() || null;
-      const empty = document.getElementById("emptyCard");
-      const reveal = document.getElementById("revealCard");
-      const question = document.getElementById("cardQuestion");
-      const answer = document.getElementById("cardAnswer");
-      const label = document.getElementById("cardLabel");
-      document.getElementById("ratingRow").classList.remove("visible");
-      answer.classList.remove("visible");
-      if (!currentCard) {
-        label.textContent = "Review complete"; question.textContent = ""; answer.textContent = "";
-        empty.hidden = false; reveal.hidden = true; updateCardStats(); return;
-      }
-      empty.hidden = true; reveal.hidden = false; reveal.textContent = "Reveal answer";
-      label.textContent = `Week ${currentCard.week} · ${currentCard.category}`;
-      question.textContent = currentCard.front;
-      answer.textContent = currentCard.back;
-      const next = previewIntervals(currentCard);
-      document.getElementById("hardInterval").textContent = intervalLabel(next.hard);
-      document.getElementById("goodInterval").textContent = intervalLabel(next.good);
-      document.getElementById("easyInterval").textContent = intervalLabel(next.easy);
-      updateCardStats();
-    }
-    function rateCurrentCard(rating) {
-      if (!currentCard) return;
-      const now = Date.now();
-      const day = 86400000;
-      const current = stateFor(currentCard);
-      const next = {...current, reviews:current.reviews + 1, last:now};
-      if (rating === "again") {
-        next.interval = 0; next.due = now + 10 * 60000; next.ease = Math.max(1.3, current.ease - .2); next.lapses = current.lapses + 1; next.reps = 0;
-      } else if (rating === "hard") {
-        next.interval = current.reps === 0 ? 1 : Math.max(1, Math.ceil(current.interval * 1.2)); next.due = now + next.interval * day; next.ease = Math.max(1.3, current.ease - .15); next.reps = current.reps + 1;
-      } else if (rating === "good") {
-        next.interval = current.reps === 0 ? 1 : current.reps === 1 ? 3 : Math.max(2, Math.ceil(current.interval * current.ease)); next.due = now + next.interval * day; next.reps = current.reps + 1;
-      } else {
-        next.interval = current.reps === 0 ? 4 : Math.max(4, Math.ceil(current.interval * current.ease * 1.3)); next.due = now + next.interval * day; next.ease = Math.min(3.2, current.ease + .15); next.reps = current.reps + 1;
-      }
-      srsState[currentCard.id] = next;
-      localStorage.setItem(srsKey, JSON.stringify(srsState));
-      showNextCard();
-    }
-    function showToast(message) {
-      const toast = document.getElementById("toast"); toast.textContent = message; toast.classList.add("show");
-      window.setTimeout(() => toast.classList.remove("show"), 2200);
-    }
-    function activateToolPane(id) {
-      document.querySelectorAll(".tool-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.pane === id));
-      document.querySelectorAll(".tool-pane").forEach(pane => pane.classList.toggle("active", pane.id === id));
-    }
-    function openInternalTool(action) {
-      if (action === "internal-speaking") { document.getElementById("speaking").scrollIntoView({behavior:"smooth"}); return; }
-      document.getElementById("flashcards").scrollIntoView({behavior:"smooth"});
-      if (action === "internal-errors") { activateToolPane("errorPane"); return; }
-      activateToolPane("addCardPane");
-      const filter = action === "internal-data" ? "data" : action === "internal-review" ? "due" : "current";
-      document.getElementById("deckFilter").value = filter;
-      rebuildReviewQueue();
-    }
-    function renderErrors() {
-      const list = document.getElementById("errorList"); list.replaceChildren();
-      errorLog.slice().reverse().slice(0,8).forEach(item => {
-        const wrap = document.createElement("div"); wrap.className = "error-item";
-        const title = document.createElement("strong"); title.textContent = item.mistake;
-        const cause = document.createElement("p"); cause.textContent = `Cause: ${item.cause}`;
-        const cue = document.createElement("p"); cue.textContent = `Cue: ${item.cue}`;
-        wrap.append(title,cause,cue); list.append(wrap);
-      });
-    }
-
-    function taskKey(week, day, index) { return `w${week}-d${day}-t${index}`; }
-    function totalTasks() { return 12 * weekdayTemplates.reduce((sum, day) => sum + day.tasks.filter(t => t[0] > 0).length, 0); }
-    function updateProgress() {
-      const total = totalTasks();
-      const done = Object.values(completed).filter(Boolean).length;
-      const percent = Math.round((done / total) * 100);
-      document.getElementById("progressPercent").textContent = `${percent}%`;
-      document.getElementById("progressCount").textContent = `${done} of ${total} tasks`;
-      document.getElementById("progressRing").style.setProperty("--progress", `${percent * 3.6}deg`);
-    }
-    function adjustmentFor(week, dayIndex) {
-      const list = weekAdjustments[week];
-      if (dayIndex === 5 && week % 4 === 0) return list[2];
-      if (dayIndex <= 1) return list[0];
-      if (dayIndex <= 3) return list[1];
-      return list[2];
-    }
-    function renderWeeks() {
-      const grid = document.getElementById("weekGrid");
-      grid.innerHTML = themes.map((_, i) => `<button class="week-button ${selectedWeek === i+1 ? "active" : ""}" data-week="${i+1}" aria-label="Week ${i+1}">${i+1}</button>`).join("");
-      grid.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => { selectedWeek = Number(btn.dataset.week); renderPlanner(); }));
-    }
-    function renderDays() {
-      const tabs = document.getElementById("dayTabs");
-      tabs.innerHTML = weekdayTemplates.map((day, i) => `<button class="day-button ${selectedDay === i ? "active" : ""}" role="tab" aria-selected="${selectedDay === i}" data-day="${i}">${day.name}</button>`).join("");
-      tabs.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => { selectedDay = Number(btn.dataset.day); renderPlanner(); }));
-    }
-    function renderTasks() {
-      const day = weekdayTemplates[selectedDay];
-      document.getElementById("dayTitle").textContent = day.name;
-      document.getElementById("dayFocus").textContent = `${day.focus}. ${adjustmentFor(selectedWeek, selectedDay)}`;
-      document.getElementById("dayTime").textContent = day.minutes ? `${day.minutes / 60} hr` : "Off";
-      const list = document.getElementById("taskList");
-      list.innerHTML = day.tasks.map((task, index) => {
-        const key = taskKey(selectedWeek, selectedDay, index);
-        const checked = Boolean(completed[key]);
-        const target = task[3];
-        const link = target?.startsWith("internal-")
-          ? `<button class="task-link internal" data-action="${target}">${target === "internal-errors" ? "Open error log ↓" : target === "internal-speaking" ? "Open speaking trainer ↓" : "Open flashcards ↓"}</button>`
-          : target ? `<a class="task-link" href="${links[target]}" target="_blank" rel="noopener">Open resource ↗</a>` : "";
-        return `<div class="task ${checked ? "done" : ""}">
-          <input class="check" type="checkbox" ${checked ? "checked" : ""} data-key="${key}" aria-label="Mark ${task[1]} complete">
-          <span class="task-time">${task[0] ? task[0] + " min" : "Rest"}</span>
-          <div><div class="task-name">${task[1]}</div><div class="task-note">${task[2]}</div></div>${link}
-        </div>`;
-      }).join("");
-      list.querySelectorAll(".check").forEach(box => box.addEventListener("change", () => {
-        completed[box.dataset.key] = box.checked;
-        localStorage.setItem(progressKey, JSON.stringify(completed));
-        box.closest(".task").classList.toggle("done", box.checked);
-        updateProgress();
-      }));
-      list.querySelectorAll(".task-link.internal").forEach(button => button.addEventListener("click", () => openInternalTool(button.dataset.action)));
-    }
-    function renderPlanner() {
-      const theme = themes[selectedWeek - 1];
-      document.getElementById("weekTag").textContent = `Week ${selectedWeek}`;
-      document.getElementById("weekTitle").textContent = theme[0];
-      document.getElementById("weekOutcome").textContent = `${theme[1]} Focus: ${theme[2]}`;
-      renderWeeks(); renderDays(); renderTasks(); updateProgress();
-      if (document.getElementById("customWeek").options.length) document.getElementById("customWeek").value = String(selectedWeek);
-      if (document.getElementById("deckFilter").value === "current") rebuildReviewQueue();
-    }
-    function currentPlanPosition() {
-      const raw = localStorage.getItem(startKey) || localStorage.getItem("dalton-study-start-v1");
-      if (!raw) return null;
-      const start = new Date(raw + "T00:00:00");
-      const now = new Date();
-      start.setHours(0,0,0,0); now.setHours(0,0,0,0);
-      const diff = Math.max(0, Math.floor((now - start) / 86400000));
-      return { week: Math.min(12, Math.floor(diff / 7) + 1), day: Math.min(6, diff % 7), finished: diff >= 84 };
-    }
-    function refreshPlanStatus() {
-      const pos = currentPlanPosition();
-      const status = document.getElementById("planStatus");
-      if (!pos) { status.textContent = "Choose “Start today” to make the dashboard follow your calendar."; return; }
-      status.textContent = pos.finished ? "The 12-week calendar is complete. Keep using targeted review and mock interviews." : `Calendar position: Week ${pos.week}, ${weekdayTemplates[pos.day].name}.`;
-    }
-    document.getElementById("startPlan").addEventListener("click", () => {
-      const today = new Date();
-      const value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
-      localStorage.setItem(startKey, value); selectedWeek = 1; selectedDay = 0; refreshPlanStatus(); renderPlanner();
-    });
-    document.getElementById("jumpCurrent").addEventListener("click", () => {
-      const pos = currentPlanPosition();
-      if (!pos) document.getElementById("startPlan").click(); else { selectedWeek = pos.week; selectedDay = pos.day; renderPlanner(); }
-    });
-
-    function setPrompt() { document.getElementById("speakPrompt").textContent = prompts[Math.floor(Math.random() * prompts.length)]; }
-    function drawTimer() { const m = Math.floor(timerSeconds / 60); const s = timerSeconds % 60; document.getElementById("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
-    document.getElementById("newPrompt").addEventListener("click", setPrompt);
-    document.getElementById("startTimer").addEventListener("click", e => {
-      if (timerHandle) { clearInterval(timerHandle); timerHandle = null; e.currentTarget.textContent = "Resume timer"; return; }
-      if (timerSeconds === 0) timerSeconds = 90;
-      e.currentTarget.textContent = "Pause timer";
-      timerHandle = setInterval(() => {
-        timerSeconds -= 1; drawTimer();
-        if (timerSeconds <= 0) { clearInterval(timerHandle); timerHandle = null; e.currentTarget.textContent = "Start 90 seconds"; }
-      }, 1000);
-    });
-    document.getElementById("timer").addEventListener("click", () => { clearInterval(timerHandle); timerHandle = null; timerSeconds = 90; drawTimer(); document.getElementById("startTimer").textContent = "Start 90 seconds"; });
-
-    const filterNames = ["All","Core","Software","Data","QA","Algorithms","Planning"];
-    function renderResources(filter="All") {
-      document.getElementById("resourceFilters").innerHTML = filterNames.map(name => `<button class="filter-button ${name === filter ? "active" : ""}" data-filter="${name}">${name}</button>`).join("");
-      document.getElementById("resourceGrid").innerHTML = resources.map(item => {
-        const visible = filter === "All" || item[1] === filter || item[2] === filter;
-        return `<article class="resource panel ${visible ? "" : "hidden"}"><div class="meta"><span class="pill">${item[1]}</span><span class="pill">${item[2]}</span></div><h3>${item[0]}</h3><p>${item[3]}</p><a href="${links[item[4]]}" target="_blank" rel="noopener">Visit ${item[0]} ↗</a></article>`;
-      }).join("");
-      document.querySelectorAll(".filter-button").forEach(btn => btn.addEventListener("click", () => renderResources(btn.dataset.filter)));
-    }
-
-    document.getElementById("revealCard").addEventListener("click", () => {
-      if (!currentCard) return;
-      document.getElementById("cardAnswer").classList.add("visible");
-      document.getElementById("ratingRow").classList.add("visible");
-      document.getElementById("revealCard").hidden = true;
-    });
-    document.querySelectorAll(".rate").forEach(button => button.addEventListener("click", () => rateCurrentCard(button.dataset.rating)));
-    document.getElementById("deckFilter").addEventListener("change", rebuildReviewQueue);
-    document.querySelectorAll(".tool-tab").forEach(tab => tab.addEventListener("click", () => activateToolPane(tab.dataset.pane)));
-    document.getElementById("customWeek").innerHTML = Array.from({length:12},(_,i) => `<option value="${i+1}">Week ${i+1}</option>`).join("");
-    document.getElementById("cardForm").addEventListener("submit", event => {
-      event.preventDefault();
-      const card = {
-        id:`custom-${Date.now()}`,
-        week:Number(document.getElementById("customWeek").value),
-        category:document.getElementById("customCategory").value,
-        front:document.getElementById("customQuestion").value.trim(),
-        back:document.getElementById("customAnswer").value.trim()
-      };
-      if (!card.front || !card.back) return;
-      customCards.push(card); localStorage.setItem(customCardsKey, JSON.stringify(customCards));
-      event.currentTarget.reset(); document.getElementById("customWeek").value = String(selectedWeek);
-      rebuildReviewQueue(); showToast("Card added to your deck");
-    });
-    document.getElementById("errorForm").addEventListener("submit", event => {
-      event.preventDefault();
-      const entry = {
-        id:`error-${Date.now()}`,
-        mistake:document.getElementById("errorMistake").value.trim(),
-        cause:document.getElementById("errorCause").value.trim(),
-        cue:document.getElementById("errorCue").value.trim(),
-        week:selectedWeek,
-        created:new Date().toISOString()
-      };
-      if (!entry.mistake || !entry.cause || !entry.cue) return;
-      errorLog.push(entry); localStorage.setItem(errorsKey, JSON.stringify(errorLog));
-      customCards.push({id:`card-${entry.id}`,week:selectedWeek,category:"Behavioral",front:`What should you recognize when this happens again: ${entry.mistake}?`,back:`Cause: ${entry.cause}\nRecognition cue: ${entry.cue}`});
-      localStorage.setItem(customCardsKey, JSON.stringify(customCards));
-      event.currentTarget.reset(); renderErrors(); rebuildReviewQueue(); showToast("Error saved and converted to a card");
-    });
-
-    setPrompt(); drawTimer(); renderResources(); renderPlanner(); refreshPlanStatus(); renderErrors();
-    document.getElementById("customWeek").value = String(selectedWeek);
-    rebuildReviewQueue();
-  </script>
+let selectedWeek=1,selectedDay=0,queue=[],current=null,timerSeconds=90,timerHandle=null;
+const progressKey="interview-helper-progress-v1",startKey="interview-helper-start-v1",srsKey="interview-helper-srs-v1",customKey="interview-helper-custom-cards-v1",errorsKey="interview-helper-errors-v1";
+let completed=JSON.parse(localStorage.getItem(progressKey)||localStorage.getItem("dalton-study-progress-v1")||"{}");
+let srs=JSON.parse(localStorage.getItem(srsKey)||"{}"),custom=JSON.parse(localStorage.getItem(customKey)||"[]"),errors=JSON.parse(localStorage.getItem(errorsKey)||"[]");
+function allCards(){return cards.concat(custom)}function stateFor(c){return srs[c.id]||{due:0,interval:0,ease:2.5,reps:0,reviews:0,lapses:0}}function isDue(c){return stateFor(c).due<=Date.now()}function key(w,d,i){return"w"+w+"-d"+d+"-t"+i}function perWeek(){return weekdays.reduce(function(n,d){return n+d.tasks.filter(function(t){return t[0]>0}).length},0)}function totalTasks(){return 12*perWeek()}function doneCount(){return Object.keys(completed).filter(function(k){return completed[k]}).length}function reviewCount(){return Object.keys(srs).reduce(function(n,k){return n+(srs[k].reviews||0)},0)}function dueCount(){return allCards().filter(isDue).length}
+function position(){const raw=localStorage.getItem(startKey)||localStorage.getItem("dalton-study-start-v1");if(!raw)return{week:1,day:0,started:false};const a=new Date(raw+"T00:00:00"),b=new Date();a.setHours(0,0,0,0);b.setHours(0,0,0,0);const e=Math.max(0,Math.floor((b-a)/86400000));return{week:Math.min(12,Math.floor(e/7)+1),day:e%7,started:true}}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(function(){el.classList.remove("show")},1800)}
+function go(view){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.id==="view-"+view)});document.querySelectorAll("[data-view]").forEach(function(b){b.classList.toggle("active",b.dataset.view===view)});if(view==="today")renderToday();if(view==="schedule")renderPlanner();if(view==="flashcards")buildQueue();if(view==="bank")renderBank();if(view==="resources")renderResources("All");if(view==="progress")renderProgress();window.scrollTo({top:0,behavior:"smooth"})}
+function internal(which){const m={"internal-bank":"bank","internal-cards":"flashcards","internal-data":"flashcards","internal-errors":"flashcards","internal-speaking":"speaking","internal-review":"progress","internal-optional":"flashcards"};if(m[which])go(m[which])}
+function adjustment(w,d){const a=adjustments[w]||[];return d===0?a[0]||"":d===2?a[1]||"":d===5?a[2]||"":""}
+function taskList(target,w,d){target.innerHTML="";weekdays[d].tasks.forEach(function(t,i){const k=key(w,d,i),row=document.createElement("div");row.className="task"+(completed[k]?" done":"");const box=document.createElement("input");box.type="checkbox";box.className="check";box.checked=!!completed[k];box.setAttribute("aria-label","Mark "+t[1]+" complete");box.onchange=function(){completed[k]=box.checked;localStorage.setItem(progressKey,JSON.stringify(completed));renderAllProgress();renderToday();renderScheduleTasks()};const time=document.createElement("span");time.className="task-time";time.textContent=t[0]?t[0]+" min":"Off";const copy=document.createElement("div");copy.innerHTML='<div class="task-name">'+t[1]+'</div><div class="task-note">'+t[2]+'</div>';let action;if(t[3].indexOf("internal-")===0){action=document.createElement("button");action.className="task-link";action.textContent="Open";action.onclick=function(){internal(t[3])}}else{action=document.createElement("a");action.className="task-link";action.textContent="Open ↗";action.href=links[t[3]];action.target="_blank";action.rel="noopener"}row.append(box,time,copy,action);target.appendChild(row)})}
+function renderToday(){const p=position(),d=weekdays[p.day];document.getElementById("todayHeroTitle").textContent="Week "+p.week+" · "+d.name;document.getElementById("todayHeroText").textContent=themes[p.week-1][0]+". "+d.focus+". "+(adjustment(p.week,p.day)||themes[p.week-1][1]);document.getElementById("todayMinutes").textContent=d.minutes;document.getElementById("todayDay").textContent=d.name;document.getElementById("todayTaskCount").textContent=d.tasks.length+" blocks";taskList(document.getElementById("todayTasks"),p.week,p.day);document.getElementById("todayDue").textContent=dueCount();document.getElementById("todayPct").textContent=Math.round(doneCount()/totalTasks()*100)+"%";document.getElementById("startPlan").textContent=p.started?"Restart plan today":"Start plan today"}
+function renderWeeks(){const grid=document.getElementById("weekGrid");grid.innerHTML="";for(let i=1;i<=12;i++){const b=document.createElement("button");b.className="week-btn"+(i===selectedWeek?" active":"");b.textContent=i;b.onclick=function(){selectedWeek=i;selectedDay=0;renderPlanner()};grid.appendChild(b)}}
+function renderDays(){const tabs=document.getElementById("dayTabs");tabs.innerHTML="";weekdays.forEach(function(d,i){const b=document.createElement("button");b.className="day-btn"+(i===selectedDay?" active":"");b.textContent=d.name;b.onclick=function(){selectedDay=i;renderPlanner()};tabs.appendChild(b)})}
+function renderScheduleTasks(){const d=weekdays[selectedDay];document.getElementById("dayTitle").textContent=d.name;document.getElementById("dayFocus").textContent=d.focus+(adjustment(selectedWeek,selectedDay)?" · "+adjustment(selectedWeek,selectedDay):"");document.getElementById("dayTime").textContent=d.minutes?Math.floor(d.minutes/60)+" hr"+(d.minutes%60?" "+d.minutes%60+" min":""):"Off";taskList(document.getElementById("taskList"),selectedWeek,selectedDay)}
+function renderPlanner(){renderWeeks();renderDays();document.getElementById("weekTag").textContent="Week "+selectedWeek;document.getElementById("weekTitle").textContent=themes[selectedWeek-1][0];document.getElementById("weekOutcome").textContent=themes[selectedWeek-1][1]+" Focus: "+themes[selectedWeek-1][2];renderScheduleTasks()}
+function renderAllProgress(){const d=doneCount(),t=totalTasks(),pct=Math.round(d/t*100);document.getElementById("railPct").textContent=pct+"%";document.getElementById("railFill").style.width=pct+"%";document.getElementById("railCount").textContent=d+" of "+t+" blocks";document.getElementById("railDue").textContent=dueCount();document.getElementById("progressPct").textContent=pct+"%";document.getElementById("progressTasks").textContent=d+" / "+t;document.getElementById("progressReviews").textContent=reviewCount()}
+function renderProgress(){renderAllProgress();const el=document.getElementById("weekProgress");el.innerHTML="";for(let w=1;w<=12;w++){let n=0;for(let d=0;d<7;d++)weekdays[d].tasks.forEach(function(t,i){if(t[0]>0&&completed[key(w,d,i)])n++});const pct=Math.round(n/perWeek()*100),row=document.createElement("div");row.className="week-progress";row.innerHTML='<span>Week '+w+'</span><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><span>'+pct+'%</span>';el.appendChild(row)}renderErrors()}
+function intervalLabel(n){return n<1?"10 minutes":n+" day"+(n===1?"":"s")}function intervals(c){const s=stateFor(c),b=Math.max(1,s.interval||1);return{again:0,hard:Math.max(1,Math.round(b*1.2)),good:s.reps===0?2:Math.max(2,Math.round(b*s.ease)),easy:s.reps===0?4:Math.max(4,Math.round(b*s.ease*1.45))}}
+function filteredDeck(f){const a=allCards();if(f==="due")return a.filter(isDue);if(f==="week")return a.filter(function(c){return c.week===position().week});if(f==="all")return a;return a.filter(function(c){return c.category===f})}
+function buildQueue(id){queue=id?allCards().filter(function(c){return c.id===id}):filteredDeck(document.getElementById("deckFilter").value).slice();current=null;showCard();updateStats()}
+function restoreQuestionArea(){const area=document.getElementById("questionArea");if(document.getElementById("cardQuestion"))return;area.innerHTML='<div class="meta" id="cardMeta"></div><h2 class="question" id="cardQuestion"></h2><button class="button" id="reveal">Reveal answer</button><div class="answer" id="answer" hidden><div class="answer-block direct"><h3>Direct answer</h3><p id="quickAnswer"></p></div><div class="answer-block"><h3>Interview explanation</h3><p id="deepAnswer"></p></div><div class="answer-block"><h3>Concrete example</h3><p id="exampleAnswer"></p></div><div class="answer-block trap"><h3>Common trap or qualification</h3><p id="trapAnswer"></p></div><div class="sources"><a class="source-link" id="questionSource" target="_blank" rel="noopener"></a><a class="source-link" id="technicalSource" target="_blank" rel="noopener"></a></div></div>';document.getElementById("reveal").onclick=revealCard}
+function showCard(){const area=document.getElementById("questionArea");document.getElementById("rating").classList.remove("visible");if(!queue.length){current=null;area.innerHTML='<div class="empty"><strong>No cards in this view.</strong><br>Choose another deck or return when reviews are due.</div>';return}restoreQuestionArea();current=queue.shift();document.getElementById("answer").hidden=true;document.getElementById("cardMeta").innerHTML='<span class="pill">'+current.category+'</span><span class="pill">'+current.level+'</span><span class="pill">Week '+current.week+'</span><span class="pill source">Source-backed</span>';document.getElementById("cardQuestion").textContent=current.q;document.getElementById("quickAnswer").textContent=current.direct||current.answer;document.getElementById("deepAnswer").textContent=current.deep||"Personal card.";document.getElementById("exampleAnswer").textContent=current.example||"Add an example from your own work.";document.getElementById("trapAnswer").textContent=current.trap||"Verify this personal card against documentation.";const qs=document.getElementById("questionSource"),ts=document.getElementById("technicalSource");qs.style.display=current.bank&&links[current.bank]?"inline-block":"none";ts.style.display=current.ref&&links[current.ref]?"inline-block":"none";if(current.bank){qs.href=links[current.bank];qs.textContent=(bankNames[current.bank]||"Question bank")+" ↗"}if(current.ref){ts.href=links[current.ref];ts.textContent=(refNames[current.ref]||"Technical reference")+" ↗"}const v=intervals(current);["again","hard","good","easy"].forEach(function(k){document.getElementById(k+"Label").textContent=intervalLabel(v[k])})}
+function revealCard(){if(!current)return;document.getElementById("answer").hidden=false;document.getElementById("rating").classList.add("visible")}
+function rate(r){if(!current)return;const st=stateFor(current),v=intervals(current);if(r==="again"){st.interval=0;st.due=Date.now()+600000;st.lapses=(st.lapses||0)+1;st.ease=Math.max(1.7,(st.ease||2.5)-.2)}else{st.interval=v[r];st.due=Date.now()+st.interval*86400000;st.reps=(st.reps||0)+1;if(r==="hard")st.ease=Math.max(1.7,(st.ease||2.5)-.05);if(r==="easy")st.ease=(st.ease||2.5)+.1}st.reviews=(st.reviews||0)+1;srs[current.id]=st;localStorage.setItem(srsKey,JSON.stringify(srs));showCard();updateStats();renderAllProgress()}
+function updateStats(){document.getElementById("dueCount").textContent=dueCount();document.getElementById("reviewedCount").textContent=reviewCount();document.getElementById("totalCards").textContent=allCards().length;document.getElementById("railDue").textContent=dueCount();document.getElementById("todayDue").textContent=dueCount()}
+function renderBank(){const q=document.getElementById("bankSearch").value.toLowerCase().trim(),cat=document.getElementById("bankCategory").value,lvl=document.getElementById("bankLevel").value,list=cards.filter(function(c){const h=(c.q+" "+c.category+" "+bankNames[c.bank]).toLowerCase();return(!q||h.indexOf(q)>=0)&&(cat==="All"||c.category===cat)&&(lvl==="All"||c.level===lvl)});document.getElementById("bankCount").textContent=list.length;const grid=document.getElementById("bankGrid");grid.innerHTML="";list.forEach(function(c){const el=document.createElement("article");el.className="card bank-card";el.innerHTML='<div class="meta"><span class="pill">'+c.category+'</span><span class="pill">'+c.level+'</span><span class="pill">Week '+c.week+'</span></div><h3>'+c.q+'</h3><p>'+c.direct+'</p><div class="bank-foot"><span class="bank-source">'+bankNames[c.bank]+'</span><button class="button small">Study</button></div>';el.querySelector("button").onclick=function(){go("flashcards");setTimeout(function(){buildQueue(c.id)},0)};grid.appendChild(el)});if(!list.length)grid.innerHTML='<div class="card empty">No questions match those filters.</div>'}
+function renderErrors(){const html=errors.length?errors.slice().reverse().slice(0,12).map(function(e){return'<div class="error-item"><strong>'+e.question+'</strong><p>'+e.lesson+'</p></div>'}).join(""):'<div class="empty">No mistakes logged yet.</div>';document.getElementById("errorList").innerHTML=html;document.getElementById("progressErrors").innerHTML=html}
+function renderResources(filter){const fs=["All","Question bank","Technical reference","Course","Software","Algorithms","Data","QA","System","Behavioral"],controls=document.getElementById("resourceFilters");controls.innerHTML="";fs.forEach(function(f){const b=document.createElement("button");b.className="filter-btn"+(f===filter?" active":"");b.textContent=f;b.onclick=function(){renderResources(f)};controls.appendChild(b)});const grid=document.getElementById("resourceGrid");grid.innerHTML="";resources.filter(function(r){return filter==="All"||r[1]===filter||r[2]===filter}).forEach(function(r){const el=document.createElement("article");el.className="card resource";el.innerHTML='<div class="meta"><span class="pill">'+r[1]+'</span><span class="pill">'+r[2]+'</span></div><h3>'+r[0]+'</h3><p>'+r[3]+'</p><a href="'+links[r[4]]+'" target="_blank" rel="noopener">Open resource ↗</a>';grid.appendChild(el)})}
+const prompts=cards.filter(function(c){return c.category!=="Algorithms"}).map(function(c){return c.q});function newPrompt(){document.getElementById("speakPrompt").textContent=prompts[Math.floor(Math.random()*prompts.length)]}function drawTimer(){const m=Math.floor(timerSeconds/60),s=timerSeconds%60;document.getElementById("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}function startTimer(){clearInterval(timerHandle);timerSeconds=90;drawTimer();document.getElementById("startTimer").textContent="Restart 90 seconds";timerHandle=setInterval(function(){timerSeconds--;drawTimer();if(timerSeconds<=0){clearInterval(timerHandle);toast("Time. Finish the sentence, then review your structure.")}},1000)}
+document.querySelectorAll("[data-view]").forEach(function(b){b.onclick=function(){go(b.dataset.view)}});document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});document.getElementById("startPlan").onclick=function(){localStorage.setItem(startKey,new Date().toISOString().slice(0,10));selectedWeek=1;selectedDay=0;renderToday();toast("Plan started today.")};document.getElementById("jumpCurrent").onclick=function(){const p=position();selectedWeek=p.week;selectedDay=p.day;renderPlanner()};document.getElementById("deckFilter").onchange=function(){buildQueue()};document.getElementById("reveal").onclick=revealCard;document.querySelectorAll("[data-rate]").forEach(function(b){b.onclick=function(){rate(b.dataset.rate)}});document.querySelectorAll("[data-pane]").forEach(function(b){b.onclick=function(){document.querySelectorAll(".tool-tab").forEach(function(x){x.classList.toggle("active",x===b)});document.querySelectorAll(".tool-pane").forEach(function(x){x.classList.toggle("active",x.id===b.dataset.pane)})}});
+document.getElementById("addCard").onclick=function(){const q=document.getElementById("customQuestion").value.trim(),a=document.getElementById("customAnswer").value.trim();if(!q||!a){toast("Add both a question and answer.");return}custom.push({id:"custom-"+Date.now(),week:Number(document.getElementById("customWeek").value),category:document.getElementById("customCategory").value,level:"Personal",q:q,direct:a,deep:"Personal card created from your notes.",example:"Add an example from a project or practice problem.",trap:"Confirm this answer against documentation.",bank:null,ref:null});localStorage.setItem(customKey,JSON.stringify(custom));document.getElementById("customQuestion").value="";document.getElementById("customAnswer").value="";buildQueue();toast("Card added.")}
+document.getElementById("addError").onclick=function(){const q=document.getElementById("errorQuestion").value.trim(),a=document.getElementById("errorLesson").value.trim();if(!q||!a){toast("Add the missed question and correction.");return}errors.push({question:q,lesson:a,created:Date.now()});custom.push({id:"error-"+Date.now(),week:position().week,category:"Personal",level:"Personal",q:q,direct:a,deep:"This card came from your error log.",example:"Recreate the situation that caused the miss.",trap:"Verify the correction against the original problem or documentation.",bank:null,ref:null});localStorage.setItem(errorsKey,JSON.stringify(errors));localStorage.setItem(customKey,JSON.stringify(custom));document.getElementById("errorQuestion").value="";document.getElementById("errorLesson").value="";renderErrors();buildQueue();toast("Error saved and card created.")}
+document.getElementById("bankSearch").oninput=renderBank;document.getElementById("bankCategory").onchange=renderBank;document.getElementById("bankLevel").onchange=renderBank;document.getElementById("newPrompt").onclick=newPrompt;document.getElementById("startTimer").onclick=startTimer;
+const weekSelect=document.getElementById("customWeek");for(let w=1;w<=12;w++){const o=document.createElement("option");o.value=w;o.textContent="Week "+w;weekSelect.appendChild(o)}const dateText=new Intl.DateTimeFormat(undefined,{weekday:"long",month:"short",day:"numeric"}).format(new Date());document.getElementById("todayDate").textContent=dateText;document.getElementById("mobileDate").textContent=dateText;
+renderPlanner();renderToday();renderAllProgress();renderErrors();renderBank();renderResources("All");newPrompt();drawTimer();buildQueue();
+</script>
 </body>
 </html>
