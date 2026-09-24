@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Interview Helper</title>
   <meta name="description" content="A focused interview preparation workspace with a schedule, sourced question bank, spaced repetition, speaking practice, and progress tracking.">
-  <meta name="theme-color" content="#f4f6f9">
+  <meta name="theme-color" content="#0c1220">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232563eb'/%3E%3Cpath d='M18 17h28v8H26v7h16v7H26v8h20v8H18z' fill='white'/%3E%3C/svg%3E">
   <style>
-    :root{color-scheme:light;--bg:#f4f6f9;--card:#fff;--ink:#172033;--muted:#667085;--line:#e2e7ef;--blue:#2563eb;--blue2:#1d4ed8;--blue-soft:#eaf1ff;--green:#16835d;--green-soft:#e7f7ef;--amber:#a86400;--amber-soft:#fff4dc;--red:#bd3650;--shadow:0 9px 26px rgba(30,42,65,.07);--radius:15px;--side:232px;--rail:286px}
+    :root{color-scheme:dark;--bg:#0c1220;--card:#151e2e;--ink:#e8edf7;--muted:#a7b4ca;--line:#303e54;--blue:#73a7ff;--blue2:#aacaff;--blue-soft:#203858;--green:#72d8ae;--green-soft:#183d35;--amber:#f0bf6b;--amber-soft:#3c3020;--red:#ff96ab;--shadow:0 9px 26px rgba(30,42,65,.07);--radius:15px;--side:232px;--rail:286px}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}.app{min-height:100vh;display:grid;grid-template-columns:var(--side) minmax(0,1fr) var(--rail)}
     .sidebar{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid var(--line);padding:19px 13px;display:flex;flex-direction:column;z-index:20}.brand{display:flex;align-items:center;gap:11px;padding:3px 9px 22px;font-size:1.02rem;font-weight:850;letter-spacing:-.02em}.logo{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:var(--blue);color:#fff;font-weight:950;box-shadow:0 7px 16px rgba(37,99,235,.2)}.nav-label,.kicker{color:#8a94a6;font-size:.69rem;text-transform:uppercase;letter-spacing:.11em;font-weight:850}.nav-label{padding:0 10px 8px}.nav{display:grid;gap:4px}.nav-btn{width:100%;border:0;border-radius:10px;background:transparent;color:#556070;padding:9px 10px;display:flex;align-items:center;gap:10px;text-align:left;font-weight:730}.nav-btn:hover{background:#f5f7fa;color:var(--ink)}.nav-btn.active{background:var(--blue-soft);color:var(--blue2)}.nav-icon{width:28px;height:28px;border:1px solid currentColor;border-radius:8px;display:grid;place-items:center;font-size:.67rem;font-weight:900}.side-note{margin-top:auto;padding:12px 10px 2px;color:var(--muted);font-size:.75rem}
     .workspace{min-width:0;padding:27px clamp(22px,3vw,42px) 70px}.view{display:none;max-width:1020px;margin:auto}.view.active{display:block}.mobile-head{display:none}.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;margin-bottom:22px}.page-head h1{margin:3px 0 4px;font-size:clamp(1.8rem,3vw,2.5rem);line-height:1.1;letter-spacing:-.045em}.page-head p{margin:0;max-width:660px;color:var(--muted)}.date-chip{white-space:nowrap;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-size:.8rem;font-weight:750}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.pad{padding:18px}
@@ -24,6 +24,16 @@
     @media(max-width:1150px){.app{grid-template-columns:205px minmax(0,1fr)}.rail{display:none}:root{--side:205px}}
     @media(max-width:820px){.app{display:block}.sidebar{display:none}.workspace{padding:15px 13px 82px}.mobile-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.mobile-head .brand{padding:0}.mobile-nav{position:fixed;z-index:70;display:flex;left:0;right:0;bottom:0;overflow-x:auto;border-top:1px solid var(--line);background:rgba(255,255,255,.96);backdrop-filter:blur(14px);padding:6px 7px calc(6px + env(safe-area-inset-bottom))}.mobile-nav .nav-btn{min-width:82px;justify-content:center;flex-direction:column;gap:1px;padding:4px;font-size:.65rem}.mobile-nav .nav-icon{width:23px;height:23px;border:0}.today-grid,.planner,.deck,.speak{grid-template-columns:1fr}.week-panel{position:static}.bank-grid{grid-template-columns:1fr}.resources{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:550px){.page-head{display:block}.date-chip{display:inline-block;margin-top:9px}.hero{grid-template-columns:1fr}.hero-num{text-align:left}.task{grid-template-columns:auto 43px minmax(0,1fr)}.task-link{grid-column:3}.bank-toolbar{grid-template-columns:1fr}.resources,.progress-grid{grid-template-columns:1fr}.rating.visible{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.review{padding:16px}.review-top{align-items:start;flex-direction:column}.review-top select{width:100%;max-width:none}.week-grid{grid-template-columns:repeat(6,1fr)}}
+    /* Dark workspace surfaces, including controls and mobile navigation. */
+    .sidebar,.date-chip,.button.secondary,.week-btn,.day-btn,.filter-btn,.tool-tab,select,input,textarea,.rate{background:var(--card)}
+    .rail,.mini,.error-item,.task.done,.stat,.source-link,.pill{background:#192538}
+    .nav-btn,.quick button,.pill,.answer-block p{color:var(--muted)}
+    .nav-btn:hover,.quick button:hover,.button.secondary:hover{background:#25344b}
+    .track{background:#303e54}.button:not(.secondary),.logo{background:#326bd1;color:#fff}
+    .button:not(.secondary):hover{background:#275bb8}
+    .mobile-nav{background:rgba(15,23,38,.97)}
+    .nav-label,.kicker,.answer-block h3{color:#a7b4ca}
+    .pipeline-guide{margin-top:18px;padding:18px}.pipeline-guide li{margin:9px 0}.pipeline-guide a{color:var(--blue)}
   </style>
 </head>
 <body>
@@ -132,12 +142,17 @@ const links={
   pgTx:"https://www.postgresql.org/docs/current/tutorial-transactions.html",
   playwright:"https://playwright.dev/docs/best-practices",
   pytest:"https://docs.pytest.org/en/stable/how-to/fixtures.html",
-  zoomcamp:"https://github.com/DataTalksClub/data-engineering-zoomcamp",
+  zoomcamp:"https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/",
+  duckdb:"https://duckdb.org/docs/stable/clients/python/overview",
+  dbt:"https://github.com/dbt-labs/jaffle_shop_duckdb",
+  dbtTests:"https://docs.getdbt.com/docs/build/data-tests",
+  mongo:"https://www.mongodb.com/docs/manual/data-modeling/",
+  pipeline:"https://duckdb.org/docs/stable/data/overview",
   fullstack:"https://fullstackopen.com/en/",
   pandas:"https://pandas.pydata.org/docs/getting_started/index.html"
 };
 const bankNames={jsBank:"GreatFrontEnd JavaScript",reactBank:"GreatFrontEnd React",frontBank:"Front End Interview Handbook",leetcode:"LeetCode 75",top150:"LeetCode Top Interview 150",datalemur:"DataLemur",deBank:"Data Engineering Interview Questions",systemBank:"System Design Primer",sdetBank:"SDET Interview Catalog",behaviorBank:"Tech Interview Handbook"};
-const refNames={mdn:"MDN JavaScript Guide",mdnEquality:"MDN Equality Comparisons",mdnClosure:"MDN Closures",mdnPromise:"MDN Promise Reference",mdnLoop:"MDN Event Loop",mdnHttp:"MDN HTTP Reference",typescript:"TypeScript Handbook",reactRender:"React Render and Commit",reactEffect:"React Effects",reactLists:"React Lists",python:"Python Documentation",postgres:"PostgreSQL Documentation",pgIndex:"PostgreSQL Indexes",pgTx:"PostgreSQL Transactions",playwright:"Playwright Best Practices",pytest:"pytest Documentation",zoomcamp:"Data Engineering Zoomcamp",behaviorBank:"Tech Interview Handbook",systemBank:"System Design Primer"};
+const refNames={mdn:"MDN JavaScript Guide",mdnEquality:"MDN Equality Comparisons",mdnClosure:"MDN Closures",mdnPromise:"MDN Promise Reference",mdnLoop:"MDN Event Loop",mdnHttp:"MDN HTTP Reference",typescript:"TypeScript Handbook",reactRender:"React Render and Commit",reactEffect:"React Effects",reactLists:"React Lists",python:"Python Documentation",postgres:"PostgreSQL Documentation",pgIndex:"PostgreSQL Indexes",pgTx:"PostgreSQL Transactions",playwright:"Playwright Best Practices",pytest:"pytest Documentation",zoomcamp:"Airflow Pipeline Concepts",behaviorBank:"Tech Interview Handbook",systemBank:"System Design Primer"};
 
 const themes=[
  ["Baseline and retrieval","Establish your baseline and explain familiar concepts without notes.","Arrays, maps, JavaScript execution and SQL aggregation"],
@@ -153,11 +168,73 @@ const themes=[
  ["Interview simulations","Combine recall, coding and project stories.","Mixed problems, STAR stories and gap repair"],
  ["Consolidation","Close high-value gaps and reduce load.","Targeted review, one final mock and portfolio polish"]
 ];
+const pipelineMilestones=[
+  [
+    "Raw data and reproducibility",
+    "Load local orders, customers and payments CSVs with Python and DuckDB. Preserve raw inputs; record row counts.",
+    "duckdb"
+  ],
+  [
+    "SQL staging",
+    "Define explicit types; handle nulls, duplicate IDs and joins. Explain the grain of each table.",
+    "pipeline"
+  ],
+  [
+    "Ingestion boundaries",
+    "Read JSON with Python; separate extract and load steps. Save a raw snapshot and test malformed input.",
+    "python"
+  ],
+  [
+    "Application database",
+    "Model orders in local PostgreSQL; practice transactions, constraints and indexes. Export a snapshot for analytics.",
+    "postgres"
+  ],
+  [
+    "Data quality",
+    "Test required fields, unique keys, valid amounts and relationships. Quarantine bad records and report rejected counts.",
+    "dbtTests"
+  ],
+  [
+    "Safe reruns",
+    "Add a date parameter, stable keys and incremental loading. Run twice and prove totals do not double.",
+    "pipeline"
+  ],
+  [
+    "dbt transformations",
+    "Run the local Jaffle Shop workshop. Build staging and reporting models; inspect the dependency graph.",
+    "dbt"
+  ],
+  [
+    "Document-store comparison",
+    "Study MongoDB embedding versus references; sketch an equivalent order model. Optional local MongoDB export into the existing pipeline.",
+    "mongo"
+  ],
+  [
+    "Reporting model",
+    "Build daily revenue and customer summaries. Document grain, source lineage, freshness and reconciliation checks.",
+    "dbt"
+  ],
+  [
+    "Orchestration and recovery",
+    "Create one local command for extract, load, transform and test; return a failure exit code on bad data. Read Airflow concepts; installation optional.",
+    "zoomcamp"
+  ],
+  [
+    "Pipeline interview drill",
+    "Demonstrate a backfill, duplicate input and a failed check. Explain retries, logs and how you would schedule this in production.",
+    "dbtTests"
+  ],
+  [
+    "Portfolio handoff",
+    "Document setup, schema, tests and tradeoffs. Map local files to object storage and local analytics to a managed warehouse without provisioning either.",
+    "dbt"
+  ]
+];
 const weekdays=[
  {name:"Monday",focus:"Algorithms and software recall",minutes:120,tasks:[[45,"LeetCode pattern practice","Solve one problem in Python. Write complexity and a recognition cue.","leetcode"],[60,"Source-backed question practice","Work through the current week's software questions before revealing answers.","internal-bank"],[15,"Closed-book recap","Explain one reviewed card aloud using answer, mechanism and example.","internal-cards"]]},
- {name:"Tuesday",focus:"Data engineering and SQL",minutes:120,tasks:[[60,"Data Engineering Zoomcamp","Complete code or exercises aligned with this week's topic.","zoomcamp"],[45,"DataLemur SQL","Solve two easy questions or one medium without copying a solution.","datalemur"],[15,"Data concept explanation","Review the Data deck and explain one answer aloud.","internal-data"]]},
+ {name:"Tuesday",focus:"Data engineering and SQL",minutes:120,tasks:[[60,"Local pipeline lesson","Read the linked reference, then implement this week’s pipeline milestone.","pipeline"],[45,"DataLemur SQL","Solve two easy questions or one medium without copying a solution.","datalemur"],[15,"Data concept explanation","Review the Data deck and explain one answer aloud.","internal-data"]]},
  {name:"Wednesday",focus:"Algorithms, Python and full-stack recall",minutes:120,tasks:[[45,"LeetCode pattern practice","Solve one problem, then reproduce it from a blank editor.","leetcode"],[45,"Python depth block","Study one behavior and write a small proof example.","python"],[30,"Question-bank rapid recall","Answer sourced questions and log repeated misses.","internal-bank"]]},
- {name:"Thursday",focus:"Pipeline building and SQL",minutes:120,tasks:[[60,"Zoomcamp project work","Implement, debug or document one commit-sized increment.","zoomcamp"],[45,"DataLemur SQL","Practice joins, aggregation, CTEs, windows or modeling.","datalemur"],[15,"Error-log update","Record what failed, why and the recognition cue.","internal-errors"]]},
+ {name:"Thursday",focus:"Pipeline building and SQL",minutes:120,tasks:[[60,"Local pipeline build","Finish the weekly milestone, test a failure case and commit the result.","pipeline"],[45,"DataLemur SQL","Practice joins, aggregation, CTEs, windows or modeling.","datalemur"],[15,"Error-log update","Record what failed, why and the recognition cue.","internal-errors"]]},
  {name:"Friday",focus:"Algorithms, systems and speaking",minutes:120,tasks:[[45,"LeetCode timed solve","Use a 35-minute cap and review reasoning for 10 minutes.","leetcode"],[45,"System design fundamentals","Sketch requirements, data flow, bottleneck and tradeoff.","systemBank"],[30,"Two spoken answers","Use the 90-second trainer and redo only the weaker response.","internal-speaking"]]},
  {name:"Saturday",focus:"Portfolio evidence and realistic practice",minutes:180,tasks:[[90,"Project evidence block","Extend a project and leave code, tests, a diagram or README evidence.","fullstack"],[60,"Timed interview practice","Alternate coding, debugging, SQL and project walkthroughs.","top150"],[30,"Weekly review","Review due cards and choose next week's highest-value gaps.","internal-review"]]},
  {name:"Sunday",focus:"Rest and consolidation",minutes:0,tasks:[[0,"Take the day off","No catch-up marathon. Optional relaxed recall only.","internal-optional"]]}
@@ -248,7 +325,11 @@ const resources=[
  ["PostgreSQL Documentation","Technical reference","Data","Official query, transaction and indexing documentation.","postgres"],
  ["Playwright Best Practices","Technical reference","QA","Official guidance for reliable browser tests.","playwright"],
  ["pytest Documentation","Technical reference","QA","Official fixture and testing documentation.","pytest"],
- ["Data Engineering Zoomcamp","Course","Data","Project-based pipeline and warehouse course.","zoomcamp"],
+ ["Local Python + DuckDB","Hands-on docs","Data","Read CSV, JSON and Parquet locally. No account or cloud warehouse needed.","duckdb"],
+ ["dbt local workshop","Workshop","Data","Use Jaffle Shop with DuckDB: SQL models, dependencies, tests and documentation. Local installation required; no enrollment.","dbt"],
+ ["dbt data tests","Reference","Data","Check uniqueness, required values and relationships.","dbtTests"],
+ ["MongoDB modeling","Reference","Data","Optional document-store extension: embedding, references and query-driven design.","mongo"],
+ ["Airflow concepts","Reference","Data","Read about scheduling and dependencies. Running Airflow is optional.","zoomcamp"],
  ["Full Stack Open","Course","Software","React, Node, APIs, testing and databases.","fullstack"]
 ];
 
@@ -262,12 +343,12 @@ function toast(t){const el=document.getElementById("toast");el.textContent=t;el.
 function go(view){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.id==="view-"+view)});document.querySelectorAll("[data-view]").forEach(function(b){b.classList.toggle("active",b.dataset.view===view)});if(view==="today")renderToday();if(view==="schedule")renderPlanner();if(view==="flashcards")buildQueue();if(view==="bank")renderBank();if(view==="resources")renderResources("All");if(view==="progress")renderProgress();window.scrollTo({top:0,behavior:"smooth"})}
 function internal(which){const m={"internal-bank":"bank","internal-cards":"flashcards","internal-data":"flashcards","internal-errors":"flashcards","internal-speaking":"speaking","internal-review":"progress","internal-optional":"flashcards"};if(m[which])go(m[which])}
 function adjustment(w,d){const a=adjustments[w]||[];return d===0?a[0]||"":d===2?a[1]||"":d===5?a[2]||"":""}
-function taskList(target,w,d){target.innerHTML="";weekdays[d].tasks.forEach(function(t,i){const k=key(w,d,i),row=document.createElement("div");row.className="task"+(completed[k]?" done":"");const box=document.createElement("input");box.type="checkbox";box.className="check";box.checked=!!completed[k];box.setAttribute("aria-label","Mark "+t[1]+" complete");box.onchange=function(){completed[k]=box.checked;localStorage.setItem(progressKey,JSON.stringify(completed));renderAllProgress();renderToday();renderScheduleTasks()};const time=document.createElement("span");time.className="task-time";time.textContent=t[0]?t[0]+" min":"Off";const copy=document.createElement("div");copy.innerHTML='<div class="task-name">'+t[1]+'</div><div class="task-note">'+t[2]+'</div>';let action;if(t[3].indexOf("internal-")===0){action=document.createElement("button");action.className="task-link";action.textContent="Open";action.onclick=function(){internal(t[3])}}else{action=document.createElement("a");action.className="task-link";action.textContent="Open ↗";action.href=links[t[3]];action.target="_blank";action.rel="noopener"}row.append(box,time,copy,action);target.appendChild(row)})}
+function taskList(target,w,d){target.innerHTML="";weekdays[d].tasks.forEach(function(base,i){const t=base.slice();if((d===1||d===3)&&i===0){const m=pipelineMilestones[w-1];t[1]=(d===1?"Learn: ":"Build: ")+m[0];t[2]=m[1]+(d===1?" Use 15 minutes for reading and 45 for implementation.":" Finish with one test and a commit.");t[3]=m[2]}const k=key(w,d,i),row=document.createElement("div");row.className="task"+(completed[k]?" done":"");const box=document.createElement("input");box.type="checkbox";box.className="check";box.checked=!!completed[k];box.setAttribute("aria-label","Mark "+t[1]+" complete");box.onchange=function(){completed[k]=box.checked;localStorage.setItem(progressKey,JSON.stringify(completed));renderAllProgress();renderToday();renderScheduleTasks()};const time=document.createElement("span");time.className="task-time";time.textContent=t[0]?t[0]+" min":"Off";const copy=document.createElement("div");copy.innerHTML='<div class="task-name">'+t[1]+'</div><div class="task-note">'+t[2]+'</div>';let action;if(t[3].indexOf("internal-")===0){action=document.createElement("button");action.className="task-link";action.textContent="Open";action.onclick=function(){internal(t[3])}}else{action=document.createElement("a");action.className="task-link";action.textContent="Open ↗";action.href=links[t[3]];action.target="_blank";action.rel="noopener"}row.append(box,time,copy,action);target.appendChild(row)})}
 function renderToday(){const p=position(),d=weekdays[p.day];document.getElementById("todayHeroTitle").textContent="Week "+p.week+" · "+d.name;document.getElementById("todayHeroText").textContent=themes[p.week-1][0]+". "+d.focus+". "+(adjustment(p.week,p.day)||themes[p.week-1][1]);document.getElementById("todayMinutes").textContent=d.minutes;document.getElementById("todayDay").textContent=d.name;document.getElementById("todayTaskCount").textContent=d.tasks.length+" blocks";taskList(document.getElementById("todayTasks"),p.week,p.day);document.getElementById("todayDue").textContent=dueCount();document.getElementById("todayPct").textContent=Math.round(doneCount()/totalTasks()*100)+"%";document.getElementById("startPlan").textContent=p.started?"Restart plan today":"Start plan today"}
 function renderWeeks(){const grid=document.getElementById("weekGrid");grid.innerHTML="";for(let i=1;i<=12;i++){const b=document.createElement("button");b.className="week-btn"+(i===selectedWeek?" active":"");b.textContent=i;b.onclick=function(){selectedWeek=i;selectedDay=0;renderPlanner()};grid.appendChild(b)}}
 function renderDays(){const tabs=document.getElementById("dayTabs");tabs.innerHTML="";weekdays.forEach(function(d,i){const b=document.createElement("button");b.className="day-btn"+(i===selectedDay?" active":"");b.textContent=d.name;b.onclick=function(){selectedDay=i;renderPlanner()};tabs.appendChild(b)})}
 function renderScheduleTasks(){const d=weekdays[selectedDay];document.getElementById("dayTitle").textContent=d.name;document.getElementById("dayFocus").textContent=d.focus+(adjustment(selectedWeek,selectedDay)?" · "+adjustment(selectedWeek,selectedDay):"");document.getElementById("dayTime").textContent=d.minutes?Math.floor(d.minutes/60)+" hr"+(d.minutes%60?" "+d.minutes%60+" min":""):"Off";taskList(document.getElementById("taskList"),selectedWeek,selectedDay)}
-function renderPlanner(){renderWeeks();renderDays();document.getElementById("weekTag").textContent="Week "+selectedWeek;document.getElementById("weekTitle").textContent=themes[selectedWeek-1][0];document.getElementById("weekOutcome").textContent=themes[selectedWeek-1][1]+" Focus: "+themes[selectedWeek-1][2];renderScheduleTasks()}
+function renderPlanner(){renderWeeks();renderDays();document.getElementById("weekTag").textContent="Week "+selectedWeek;document.getElementById("weekTitle").textContent=themes[selectedWeek-1][0];document.getElementById("weekOutcome").textContent=themes[selectedWeek-1][1]+" Focus: "+themes[selectedWeek-1][2]+". Pipeline milestone: "+pipelineMilestones[selectedWeek-1][0]+". "+pipelineMilestones[selectedWeek-1][1];renderScheduleTasks()}
 function renderAllProgress(){const d=doneCount(),t=totalTasks(),pct=Math.round(d/t*100);document.getElementById("railPct").textContent=pct+"%";document.getElementById("railFill").style.width=pct+"%";document.getElementById("railCount").textContent=d+" of "+t+" blocks";document.getElementById("railDue").textContent=dueCount();document.getElementById("progressPct").textContent=pct+"%";document.getElementById("progressTasks").textContent=d+" / "+t;document.getElementById("progressReviews").textContent=reviewCount()}
 function renderProgress(){renderAllProgress();const el=document.getElementById("weekProgress");el.innerHTML="";for(let w=1;w<=12;w++){let n=0;for(let d=0;d<7;d++)weekdays[d].tasks.forEach(function(t,i){if(t[0]>0&&completed[key(w,d,i)])n++});const pct=Math.round(n/perWeek()*100),row=document.createElement("div");row.className="week-progress";row.innerHTML='<span>Week '+w+'</span><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><span>'+pct+'%</span>';el.appendChild(row)}renderErrors()}
 function intervalLabel(n){return n<1?"10 minutes":n+" day"+(n===1?"":"s")}function intervals(c){const s=stateFor(c),b=Math.max(1,s.interval||1);return{again:0,hard:Math.max(1,Math.round(b*1.2)),good:s.reps===0?2:Math.max(2,Math.round(b*s.ease)),easy:s.reps===0?4:Math.max(4,Math.round(b*s.ease*1.45))}}
