@@ -71,7 +71,7 @@
     </section>
 
     <section class="view" id="view-schedule">
-      <div class="page-head"><div><span class="kicker">Weekly routine + Odin track</span><h1>Schedule</h1><p>Pick a weekday to preview its routine. Odin lessons stay in order until you mark them complete; projects can span many sessions.</p></div><button class="button secondary" id="jumpCurrent">Jump to today</button></div>
+      <div class="page-head"><div><span class="kicker">Weekly routine + Odin track</span><h1>Schedule</h1><p>Odin: Tuesday, Thursday and Saturday. Monday, Wednesday and Friday: LeetCode, JS Den and practical Python. Lessons stay in sequence; unfinished projects resume at your saved stopping point.</p></div><button class="button secondary" id="jumpCurrent">Jump to today</button></div>
       <div class="planner">
         <aside class="card week-panel"><strong>Odin learning steps</strong><div class="week-grid" id="weekGrid"></div><p style="margin:9px 0 0;color:var(--muted);font-size:.74rem">Completion is stored on this device.</p></aside>
         <article class="card planner-main"><div class="week-title"><div><span class="badge" id="weekTag"></span><h2 id="weekTitle"></h2><p id="weekOutcome"></p></div><span class="time-label">13 hr total</span></div><div class="day-tabs" id="dayTabs"></div><div class="day-summary"><div><h3 id="dayTitle"></h3><p id="dayFocus"></p></div><span class="time-label" id="dayTime"></span></div><div class="task-list" id="taskList"></div></article>
@@ -170,10 +170,13 @@ const themes=[
  ["Interview simulations","Combine recall, coding and project stories.","Mixed problems, STAR stories and gap repair"],
  ["Consolidation","Close high-value gaps and reduce load.","Targeted review, one final mock and portfolio polish"]
 ];
-const odinStages=[["SQL foundations","https://www.theodinproject.com/paths/full-stack-javascript/courses/databases",["Databases","Databases and SQL","Project: SQL Zoo"],"Complete the SQL Zoo assignment linked by Odin. Save queries you initially got wrong and explain joins, grouping and NULL.","where-having joins null-sql"],["Node fundamentals","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Introduction to the Back End","Introduction: What is NodeJS?","Getting Started","Debugging Node","Project: Basic Informational Site","Environment Variables"],"Run the informational site locally. Explain how a request reaches your code and how configuration is loaded.","event-loop await http-status"],["Express and request handling","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Introduction to Frameworks","Introduction to Express","Routes","Controllers","Views","Project: Mini Message Board"],"Complete the message-board assignment and trace one request through route, controller and response.","http-status http-idempotent validation"],["PostgreSQL application data","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Forms and Data Handling","Installing PostgreSQL","Using PostgreSQL","Project: Inventory Application"],"Complete inventory CRUD with related tables. Test invalid input, missing records and deletion rules.","joins transaction index validation"],["Authentication","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Authentication Basics","Project: Members Only"],"Complete the authentication project. Test logged-out access and authorization, not only successful login.","http-status validation"],["ORMs and schema changes","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Prisma ORM","Project: File Uploader"],"Complete the ORM exercise/project and explain a relation and schema migration. Use the lesson's local setup where available.","transaction index"],["React refresher","https://www.theodinproject.com/paths/full-stack-javascript/courses/react",["Passing Data Between Components","Keys In React","Introduction To State","More On State","How To Deal With Side Effects","Project: Memory Card"],"Complete the memory-card project. For familiar topics, attempt the knowledge checks first and read only the gaps.","react-render react-key react-effect closure"],["React data and testing","https://www.theodinproject.com/paths/full-stack-javascript/courses/react",["Introduction To React Testing","Mocking Callbacks And Components","React Router","Fetching Data In React","Project: Shopping Cart"],"Complete the shopping cart. Check navigation, loading/error states and at least one meaningful component test.","react-effect mocks test-layers selectors"],["Backend APIs","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["API Basics","API Security","Project: Blog API"],"Build the Blog API assignment and its separate frontend clients; connect a React UI to the API and PostgreSQL.","http-idempotent validation pagination"],["Backend testing","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Testing Routes and Controllers","Testing Database Operations"],"Follow the testing assignments. Include a success case, invalid input and unauthorized access where applicable.","api-test test-layers mocks flaky"],["Full-stack project","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Project: Messaging App"],"Complete the messaging assignment with React, Express and PostgreSQL. Work in small tested increments.","queue pagination project-story bug-story"],["Deployment and portfolio","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Deployment","Conclusion"],"Apply the deployment lesson to your strongest completed app. Document configuration, tests and setup. Hosting may require a separate account; never commit secrets.","ownership learning failure conflict unknown"]];
-const odinLessons=[{"title":"Databases","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":0},{"title":"Databases and SQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":0},{"title":"Project: SQL Zoo","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":0},{"title":"Introduction to the Back End","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Introduction: What is NodeJS?","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Getting Started","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Debugging Node","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Project: Basic Informational Site","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Environment Variables","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Introduction to Frameworks","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Introduction to Express","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Routes","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Controllers","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Views","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Project: Mini Message Board","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Forms and Data Handling","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Installing PostgreSQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Using PostgreSQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Project: Inventory Application","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Authentication Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Project: Members Only","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Prisma ORM","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Project: File Uploader","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Passing Data Between Components","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Keys In React","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Introduction To State","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"More On State","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"How To Deal With Side Effects","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Project: Memory Card","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Introduction To React Testing","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"Mocking Callbacks And Components","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"React Router","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"Fetching Data In React","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"Project: Shopping Cart","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"API Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"API Security","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"Project: Blog API","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"Testing Routes and Controllers","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":9},{"title":"Testing Database Operations","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":9},{"title":"Project: Messaging App","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":10},{"title":"Deployment","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":11},{"title":"Conclusion","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":11}];
-const odinKey="interview-helper-odin-v1";
+const odinStages=[["JavaScript targeted review","https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript",["Factory Functions and the Module Pattern","Classes","ES6 Modules","npm","JSON","Asynchronous Code","Working with APIs","Async and Await","Project: Weather App","Testing Basics","Project: Testing Practice"],"Try each lesson's knowledge checks first. If familiar, demonstrate the behavior in a small example; otherwise complete the assigned practice. Build the Weather App and testing exercises.","js-scope closure event-loop await test-layers"],["React review and integration","https://www.theodinproject.com/paths/full-stack-javascript/courses/react",["Passing Data Between Components","Keys In React","Introduction To State","More On State","How To Deal With Side Effects","Project: Memory Card","Introduction To React Testing","Mocking Callbacks And Components","React Router","Fetching Data In React","Project: Shopping Cart"],"Review state and effects, then complete the Memory Card and Shopping Cart assignments, including routing, data fetching and testing.","react-render react-key react-effect closure react-effect mocks test-layers selectors"],["SQL foundations","https://www.theodinproject.com/paths/full-stack-javascript/courses/databases",["Databases","Databases and SQL","Project: SQL Zoo"],"Complete the SQL Zoo assignment linked by Odin. Save queries you initially got wrong and explain joins, grouping and NULL.","where-having joins null-sql"],["Node fundamentals","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Introduction to the Back End","Introduction: What is NodeJS?","Getting Started","Debugging Node","Project: Basic Informational Site","Environment Variables"],"Run the informational site locally. Explain how a request reaches your code and how configuration is loaded.","event-loop await http-status"],["Express and request handling","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Introduction to Frameworks","Introduction to Express","Routes","Controllers","Views","Project: Mini Message Board"],"Complete the message-board assignment and trace one request through route, controller and response.","http-status http-idempotent validation"],["PostgreSQL application data","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Forms and Data Handling","Installing PostgreSQL","Using PostgreSQL","Project: Inventory Application"],"Complete inventory CRUD with related tables. Test invalid input, missing records and deletion rules.","joins transaction index validation"],["Authentication","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Authentication Basics","Project: Members Only"],"Complete the authentication project. Test logged-out access and authorization, not only successful login.","http-status validation"],["ORMs and schema changes","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Prisma ORM","Project: File Uploader"],"Complete the ORM exercise/project and explain a relation and schema migration. Use the lesson's local setup where available.","transaction index"],["Backend APIs","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["API Basics","API Security","Project: Blog API"],"Build the Blog API assignment and its separate frontend clients; connect a React UI to the API and PostgreSQL.","http-idempotent validation pagination"],["Backend testing","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Testing Routes and Controllers","Testing Database Operations"],"Follow the testing assignments. Include a success case, invalid input and unauthorized access where applicable.","api-test test-layers mocks flaky"],["Full-stack project","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Project: Messaging App"],"Complete the messaging assignment with React, Express and PostgreSQL. Work in small tested increments.","queue pagination project-story bug-story"],["Deployment and portfolio","https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs",["Deployment","Conclusion"],"Apply the deployment lesson to your strongest completed app. Document configuration, tests and setup. Hosting may require a separate account; never commit secrets.","ownership learning failure conflict unknown"]];
+const odinLessons=[{"title":"Factory Functions and the Module Pattern","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Classes","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"ES6 Modules","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"npm","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"JSON","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Asynchronous Code","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Working with APIs","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Async and Await","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Project: Weather App","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Testing Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Project: Testing Practice","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript","stage":0},{"title":"Passing Data Between Components","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Keys In React","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Introduction To State","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"More On State","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"How To Deal With Side Effects","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Project: Memory Card","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Introduction To React Testing","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Mocking Callbacks And Components","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"React Router","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Fetching Data In React","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Project: Shopping Cart","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":1},{"title":"Databases","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":2},{"title":"Databases and SQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":2},{"title":"Project: SQL Zoo","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":2},{"title":"Introduction to the Back End","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Introduction: What is NodeJS?","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Getting Started","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Debugging Node","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Project: Basic Informational Site","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Environment Variables","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Introduction to Frameworks","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Introduction to Express","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Routes","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Controllers","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Views","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Project: Mini Message Board","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Forms and Data Handling","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Installing PostgreSQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Using PostgreSQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Project: Inventory Application","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Authentication Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":6},{"title":"Project: Members Only","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":6},{"title":"Prisma ORM","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":7},{"title":"Project: File Uploader","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":7},{"title":"API Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"API Security","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"Project: Blog API","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"Testing Routes and Controllers","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":9},{"title":"Testing Database Operations","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":9},{"title":"Project: Messaging App","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":10},{"title":"Deployment","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":11},{"title":"Conclusion","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":11}];
+const odinKey="interview-helper-odin-v2";
 let odinState=JSON.parse(localStorage.getItem(odinKey)||'{"done":{},"notes":{}}');
+if(!localStorage.getItem(odinKey)){const previous=JSON.parse(localStorage.getItem("interview-helper-odin-v1")||'{"done":{},"notes":{}}'),previousLessons=[{"title":"Databases","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":0},{"title":"Databases and SQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":0},{"title":"Project: SQL Zoo","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/databases","stage":0},{"title":"Introduction to the Back End","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Introduction: What is NodeJS?","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Getting Started","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Debugging Node","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Project: Basic Informational Site","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Environment Variables","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":1},{"title":"Introduction to Frameworks","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Introduction to Express","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Routes","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Controllers","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Views","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Project: Mini Message Board","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":2},{"title":"Forms and Data Handling","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Installing PostgreSQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Using PostgreSQL","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Project: Inventory Application","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":3},{"title":"Authentication Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Project: Members Only","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":4},{"title":"Prisma ORM","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Project: File Uploader","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":5},{"title":"Passing Data Between Components","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Keys In React","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Introduction To State","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"More On State","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"How To Deal With Side Effects","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Project: Memory Card","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":6},{"title":"Introduction To React Testing","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"Mocking Callbacks And Components","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"React Router","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"Fetching Data In React","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"Project: Shopping Cart","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/react","stage":7},{"title":"API Basics","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"API Security","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"Project: Blog API","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":8},{"title":"Testing Routes and Controllers","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":9},{"title":"Testing Database Operations","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":9},{"title":"Project: Messaging App","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":10},{"title":"Deployment","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":11},{"title":"Conclusion","url":"https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs","stage":11}];
+previousLessons.forEach((l,i)=>{const n=odinLessons.findIndex(x=>x.title===l.title&&x.url===l.url);if(n>=0){if(previous.done[i])odinState.done[n]=true;if(previous.notes[i])odinState.notes[n]=previous.notes[i]}});localStorage.setItem(odinKey,JSON.stringify(odinState))}
+
 const pythonLessons=[["Virtual environments and dependencies","https://docs.python.org/3/tutorial/venv.html","Read sections 12.2 and 12.3. Create a .venv in a new python-practice project, install pytest there, save requirements.txt and verify the interpreter path.","Recreate the environment from requirements.txt and run python -m pytest --version."],["Reading files","https://programming-26.mooc.fi/part-6/1-reading-files/","Work through Reading data from a file and Going through the contents of a file. Reproduce a worked example locally, then modify it to print line and word counts for a three-line text file.","Run your script on a normal and an empty file; explain why with closes the file."],["Writing files","https://programming-26.mooc.fi/part-6/2-writing-files/","Follow the writing and appending examples. Write a summary to a new file, then append one run result without overwriting the original input.","Run twice and inspect the output; explain the difference between w and a modes."],["Exceptions","https://docs.python.org/3/tutorial/errors.html","Read Handling Exceptions, Raising Exceptions and Predefined Clean-up Actions. Add specific handling for a missing file and invalid numeric data to your practice script.","Demonstrate valid input, a missing file and malformed input. Do not silently swallow errors."],["Using modules","https://programming-26.mooc.fi/part-7/1-modules/","Read the import examples. Reproduce two examples locally, then explain import module versus from module import name.","Save a runnable script using two standard-library modules and explain how names are resolved."],["CSV, JSON and online data","https://programming-26.mooc.fi/part-7/4-data-processing/","Work through Reading CSV files and Reading JSON files using the page's sample data. Use csv.reader and json.loads, then modify the code to select one field. Try the online retrieval example after local parsing works.","Print the selected fields correctly; test a quoted CSV separator and malformed JSON. This section may need several sessions."],["Creating your own modules","https://programming-26.mooc.fi/part-7/5-creating-modules/","Follow the module examples. Move your parsing functions into a separate module and import them from a runner. Prevent the runner from executing when imported.","Import your module without side effects, then run the script and confirm the same results."],["Testing your utility","https://docs.pytest.org/en/stable/getting-started.html","Follow Create your first test and Assert that a certain exception is raised. Add tests for your parser: valid data, empty input and malformed data.","Run python -m pytest successfully and document the environment setup and run command."]];
 const jsdenQuestions=[{"title":"var, let, and const Differences","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/core-js-questions/var-let-const-differences"},{"title":"Explain Hoisting","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/core-js-questions/explain-hoisting"},{"title":"Scope in JavaScript","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/core-js-questions/scope-in-javascript"},{"title":"Promises","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/async-questions/promises"},{"title":"Async Await","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/async-questions/async-await"},{"title":"Closures","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/async-questions/closures"},{"title":"Event Loop","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/async-questions/event-loop"},{"title":"Explain useState hook","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/react-interview-questions/explain-usestate"},{"title":"Explain useEffect hook","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/react-interview-questions/explain-useeffect"},{"title":"What are controlled components?","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/react-interview-questions/controlled-components"},{"title":"What is the key prop?","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/react-interview-questions/what-is-key-prop"},{"title":"What is React Router?","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/react-interview-questions/what-is-react-router"},{"title":"What is Middleware in Node.js?","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/nodejs-interview-questions/nodejs-middleware"},{"title":"require() vs import in Node.js","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/nodejs-interview-questions/nodejs-require-vs-import"},{"title":"Environment Variables & Configuration","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/nodejs-interview-questions/nodejs-env-variables"},{"title":"Error Handling Best Practices in Node.js","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/nodejs-interview-questions/nodejs-error-handling"},{"title":"SQL vs NoSQL Databases","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/database-interview-questions/db-sql-vs-nosql"},{"title":"How do Database Indexes Work?","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/database-interview-questions/db-indexing"},{"title":"Explain ACID Properties","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/database-interview-questions/db-acid-properties"},{"title":"Database Normalization (1NF, 2NF, 3NF)","url":"https://jsden.com/courses/javascript-core/modules/interview-questions/database-interview-questions/db-normalization"}];
 const extraKey="interview-helper-extra-tracks-v1";
@@ -184,32 +187,7 @@ function extraAssignment(kind){if(kind==="python"){const n=Math.min(extraState.p
 const weekdays=[
   {
     "name": "Monday",
-    "focus": "Odin + LeetCode",
-    "minutes": 120,
-    "tasks": [
-      [
-        15,
-        "Spoken flashcards",
-        "Due first.",
-        "srs"
-      ],
-      [
-        60,
-        "Odin",
-        "Continue your lesson.",
-        "odin"
-      ],
-      [
-        45,
-        "LeetCode",
-        "Python coding.",
-        "code"
-      ]
-    ]
-  },
-  {
-    "name": "Tuesday",
-    "focus": "Odin + JS Den",
+    "focus": "Algorithms, JS Den and Python",
     "minutes": 120,
     "tasks": [
       [
@@ -219,59 +197,53 @@ const weekdays=[
         "srs"
       ],
       [
-        60,
-        "Odin",
-        "Continue your lesson.",
-        "odin"
+        45,
+        "LeetCode in Python",
+        "Next unfinished coding problem.",
+        "code"
       ],
       [
         30,
         "JS Den",
-        "Three interview questions.",
+        "Review the next question batch.",
         "jsden"
       ],
       [
+        30,
+        "Practical Python",
+        "Next unfinished practical lesson.",
+        "python"
+      ]
+    ]
+  },
+  {
+    "name": "Tuesday",
+    "focus": "Odin full-stack development",
+    "minutes": 120,
+    "tasks": [
+      [
         15,
-        "Save notes",
-        "Record where to resume.",
+        "Spoken flashcards",
+        "Due reviews first.",
+        "srs"
+      ],
+      [
+        90,
+        "Odin lesson / project",
+        "Next unfinished course assignment.",
+        "odin"
+      ],
+      [
+        15,
+        "Save progress",
+        "Record your next action.",
         "notes"
       ]
     ]
   },
   {
     "name": "Wednesday",
-    "focus": "Odin + practical Python",
-    "minutes": 120,
-    "tasks": [
-      [
-        15,
-        "Spoken flashcards",
-        "Due first.",
-        "srs"
-      ],
-      [
-        30,
-        "Odin",
-        "Continue your lesson.",
-        "odin"
-      ],
-      [
-        45,
-        "LeetCode",
-        "Python coding.",
-        "code"
-      ],
-      [
-        30,
-        "Practical Python",
-        "Continue the short Python track.",
-        "python"
-      ]
-    ]
-  },
-  {
-    "name": "Thursday",
-    "focus": "Odin + JS Den",
+    "focus": "Algorithms, JS Den and Python",
     "minutes": 120,
     "tasks": [
       [
@@ -281,72 +253,97 @@ const weekdays=[
         "srs"
       ],
       [
-        60,
-        "Odin",
-        "Continue your lesson.",
-        "odin"
+        45,
+        "LeetCode in Python",
+        "Next unfinished coding problem.",
+        "code"
       ],
       [
         30,
         "JS Den",
-        "Three interview questions.",
+        "Review the next question batch.",
         "jsden"
       ],
       [
+        30,
+        "Practical Python",
+        "Next unfinished practical lesson.",
+        "python"
+      ]
+    ]
+  },
+  {
+    "name": "Thursday",
+    "focus": "Odin full-stack development",
+    "minutes": 120,
+    "tasks": [
+      [
         15,
-        "Save notes",
-        "Record where to resume.",
+        "Spoken flashcards",
+        "Due reviews first.",
+        "srs"
+      ],
+      [
+        90,
+        "Odin lesson / project",
+        "Next unfinished course assignment.",
+        "odin"
+      ],
+      [
+        15,
+        "Save progress",
+        "Record your next action.",
         "notes"
       ]
     ]
   },
   {
     "name": "Friday",
-    "focus": "Odin + LeetCode",
+    "focus": "Algorithms, JS Den and Python",
     "minutes": 120,
     "tasks": [
       [
         15,
         "Spoken flashcards",
-        "Due first.",
+        "Due reviews first.",
         "srs"
       ],
       [
-        60,
-        "Odin",
-        "Continue your lesson.",
-        "odin"
+        45,
+        "LeetCode in Python",
+        "Next unfinished coding problem.",
+        "code"
       ],
       [
-        45,
-        "LeetCode",
-        "Python coding.",
-        "code"
+        30,
+        "JS Den",
+        "Review the next question batch.",
+        "jsden"
+      ],
+      [
+        30,
+        "Practical Python",
+        "Next unfinished practical lesson.",
+        "python"
       ]
     ]
   },
   {
     "name": "Saturday",
-    "focus": "Odin + practical Python",
+    "focus": "Odin full-stack development",
     "minutes": 180,
     "tasks": [
       [
         30,
         "Spoken flashcards",
-        "Due first.",
+        "Due reviews first.",
         "srs"
       ],
       [
-        90,
-        "Odin project",
-        "Continue your lesson.",
+        150,
+        "Odin project work",
+        "Continue the same unfinished project; take breaks within this time.",
         "odin"
-      ],
-      [
-        60,
-        "Practical Python",
-        "Continue the short Python track.",
-        "python"
       ]
     ]
   },
@@ -433,7 +430,7 @@ const cards=[
  card("null-sql",12,"Data","Junior","datalemur","postgres","How does SQL NULL affect comparisons?","NULL represents unknown or missing, so ordinary comparisons produce unknown rather than true.","Use IS NULL or IS NOT NULL. Three-valued logic affects WHERE, joins and NOT IN behavior.","WHERE deleted_at=NULL matches nothing; use IS NULL.","NOT IN can surprise when its subquery contains NULL; NOT EXISTS is often safer.")
 ];
 const resources=[
-["JS Den Interview Prep","Question bank","Software","Scheduled Tuesday and Thursday: verified question links and personal review notes.","jsden"],
+["JS Den Interview Prep","Question bank","Software","Scheduled Monday, Wednesday and Friday: verified question links and personal review notes.","jsden"],
 ["Python MOOC: files","Course","Software","Selected practical lessons, not a beginner restart.","pythonFiles"],
 ["Python MOOC: CSV and JSON","Course","Data","Parsing data and retrieving files from the internet.","pythonData"],
 ["Python environments","Technical reference","Software","venv, pip and dependency recreation.","pythonVenv"],
@@ -498,7 +495,7 @@ const codingSets=[
 ["Valid Palindrome","Maximum Depth of Binary Tree","House Robber"]
 ];
 
-function assignment(w,d,i){const t=weekdays[d].tasks[i],kind=t[3],idx=currentLesson(),l=idx<0?null:odinLessons[idx];if(kind==="python"||kind==="jsden")return extraAssignment(kind);if(kind==="odin")return{title:l?"Odin: "+l.title:"Odin track complete",steps:l?["Open the "+["Databases","NodeJS","React"].find(n=>l.url.includes(n.toLowerCase()))+" course link and select the exact lesson “"+l.title+"”.","Read the lesson and complete its Assignment and Knowledge Check. For projects, implement the next unfinished requirement; you are not expected to finish a whole project in this block.","Use the last five minutes to save a resume note here. Mark the lesson complete only when its assignment is finished; marking today's time block does not advance the course." ]:["Polish your strongest project or revisit a weak topic."],done:"Work for the allocated time and save where to resume.",url:l?l.url:null,kind};
+function assignment(w,d,i){const t=weekdays[d].tasks[i],kind=t[3],idx=currentLesson(),l=idx<0?null:odinLessons[idx];if(kind==="python"||kind==="jsden")return extraAssignment(kind);if(kind==="odin")return{title:l?"Odin: "+l.title:"Odin track complete",steps:l?["Open the "+["Databases","NodeJS","React","JavaScript"].find(n=>l.url.includes(n.toLowerCase()))+" course link and select the exact lesson “"+l.title+"”.","Read the lesson and complete its Assignment and Knowledge Check. For projects, implement the next unfinished requirement; you are not expected to finish a whole project in this block.","Use the last five minutes to save a resume note here. Mark the lesson complete only when its assignment is finished; marking today's time block does not advance the course." ]:["Polish your strongest project or revisit a weak topic."],done:"Work for the allocated time and save where to resume.",url:l?l.url:null,kind};
 if(kind==="srs")return{title:"Flashcards: answer aloud",steps:["Review due cards first. Say your answer aloud before revealing: direct answer, mechanism and one example.","Use Again if you could not explain it, Hard for effortful correct recall, Good for a clear correct answer, Easy only for immediate confident recall.","Up to five new cards per day are drawn from current/completed Odin topics and algorithms. Stop when the time is up; overdue cards stay due."],done:"Finish the review queue or use the allotted time. No separate speaking exercise.",kind};
 if(kind==="notes")return{title:"Save your stopping point + one useful card",steps:["Write the exact Odin section, exercise or bug to resume.","If you learned a concept you could not explain, add one short question and a verified answer to Flashcards. Include its lesson URL in your answer.","If nothing new needs a card, test an edge case and record the result."],done:"Save a resume note and, when useful, one personal flashcard.",kind};
 const n=Number(localStorage.getItem("interview-helper-code-next-v1")||0),flat=codingSets.flat(),name=flat[n%flat.length];return{title:(d===5?"Timed practice: ":"LeetCode: ")+name,steps:["Open the search result with the exact title “"+name+"”. Use Python. Solve locally if you prefer not to sign in.",d===5?"Set a 25-minute timer, then spend five minutes recording the result.":"Spend 30 minutes attempting the problem without solutions, then 15 minutes testing and explaining complexity.","If you are stuck, record a useful hint and resume this same problem next time. Advance only when you have reviewed the attempt and understand the approach."],done:"Save code, test cases, complexity and one recognition cue.",url:"https://leetcode.com/problemset/?search="+encodeURIComponent(name),kind:"code"};
@@ -527,7 +524,7 @@ function updateStats(){document.getElementById("dueCount").textContent=dueCount(
 function renderBank(){const q=document.getElementById("bankSearch").value.toLowerCase().trim(),cat=document.getElementById("bankCategory").value,lvl=document.getElementById("bankLevel").value,list=cards.filter(function(c){const h=(c.q+" "+c.category+" "+bankNames[c.bank]).toLowerCase();return(!q||h.indexOf(q)>=0)&&(cat==="All"||c.category===cat)&&(lvl==="All"||c.level===lvl)});document.getElementById("bankCount").textContent=list.length;const grid=document.getElementById("bankGrid");grid.innerHTML="";list.forEach(function(c){const el=document.createElement("article");el.className="card bank-card";el.innerHTML='<div class="meta"><span class="pill">'+c.category+'</span><span class="pill">'+c.level+'</span><span class="pill">Week '+c.week+'</span></div><h3>'+c.q+'</h3><p>'+c.direct+'</p><div class="bank-foot"><span class="bank-source">'+bankNames[c.bank]+'</span><button class="button small">Study</button></div>';el.querySelector("button").onclick=function(){go("flashcards");setTimeout(function(){buildQueue(c.id)},0)};grid.appendChild(el)});if(!list.length)grid.innerHTML='<div class="card empty">No questions match those filters.</div>'}
 function renderErrors(){const html=errors.length?errors.slice().reverse().slice(0,12).map(function(e){return'<div class="error-item"><strong>'+e.question+'</strong><p>'+e.lesson+'</p></div>'}).join(""):'<div class="empty">No mistakes logged yet.</div>';document.getElementById("errorList").innerHTML=html;document.getElementById("progressErrors").innerHTML=html}
 function renderResources(filter){const fs=["All","Question bank","Technical reference","Course","Software","Algorithms","Data","QA","System","Behavioral"],controls=document.getElementById("resourceFilters");controls.innerHTML="";fs.forEach(function(f){const b=document.createElement("button");b.className="filter-btn"+(f===filter?" active":"");b.textContent=f;b.onclick=function(){renderResources(f)};controls.appendChild(b)});const grid=document.getElementById("resourceGrid");grid.innerHTML="";resources.filter(function(r){return filter==="All"||r[1]===filter||r[2]===filter}).forEach(function(r){const el=document.createElement("article");el.className="card resource";el.innerHTML='<div class="meta"><span class="pill">'+r[1]+'</span><span class="pill">'+r[2]+'</span></div><h3>'+r[0]+'</h3><p>'+r[3]+'</p><a href="'+links[r[4]]+'" target="_blank" rel="noopener">Open resource ↗</a>';grid.appendChild(el)})}
-document.querySelectorAll("[data-view]").forEach(function(b){b.onclick=function(){go(b.dataset.view)}});document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});document.getElementById("startPlan").onclick=function(){openAssignment(1,0,1)};document.getElementById("jumpCurrent").onclick=function(){go("today")};document.getElementById("deckFilter").onchange=function(){buildQueue()};document.getElementById("reveal").onclick=revealCard;document.querySelectorAll("[data-rate]").forEach(function(b){b.onclick=function(){rate(b.dataset.rate)}});document.querySelectorAll("[data-pane]").forEach(function(b){b.onclick=function(){document.querySelectorAll(".tool-tab").forEach(function(x){x.classList.toggle("active",x===b)});document.querySelectorAll(".tool-pane").forEach(function(x){x.classList.toggle("active",x.id===b.dataset.pane)})}});
+document.querySelectorAll("[data-view]").forEach(function(b){b.onclick=function(){go(b.dataset.view)}});document.querySelectorAll("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}});document.getElementById("startPlan").onclick=function(){openAssignment(1,1,1)};document.getElementById("jumpCurrent").onclick=function(){go("today")};document.getElementById("deckFilter").onchange=function(){buildQueue()};document.getElementById("reveal").onclick=revealCard;document.querySelectorAll("[data-rate]").forEach(function(b){b.onclick=function(){rate(b.dataset.rate)}});document.querySelectorAll("[data-pane]").forEach(function(b){b.onclick=function(){document.querySelectorAll(".tool-tab").forEach(function(x){x.classList.toggle("active",x===b)});document.querySelectorAll(".tool-pane").forEach(function(x){x.classList.toggle("active",x.id===b.dataset.pane)})}});
 document.getElementById("addCard").onclick=function(){const q=document.getElementById("customQuestion").value.trim(),a=document.getElementById("customAnswer").value.trim();if(!q||!a){toast("Add both a question and answer.");return}custom.push({id:"custom-"+Date.now(),week:Number(document.getElementById("customWeek").value),category:document.getElementById("customCategory").value,level:"Personal",q:q,direct:a,deep:"Personal card created from your notes.",example:"Add an example from a project or practice problem.",trap:"Confirm this answer against documentation.",bank:null,ref:null});localStorage.setItem(customKey,JSON.stringify(custom));document.getElementById("customQuestion").value="";document.getElementById("customAnswer").value="";buildQueue();toast("Card added.")}
 document.getElementById("addError").onclick=function(){const q=document.getElementById("errorQuestion").value.trim(),a=document.getElementById("errorLesson").value.trim();if(!q||!a){toast("Add the missed question and correction.");return}errors.push({question:q,lesson:a,created:Date.now()});custom.push({id:"error-"+Date.now(),week:position().week,category:"Personal",level:"Personal",q:q,direct:a,deep:"This card came from your error log.",example:"Recreate the situation that caused the miss.",trap:"Verify the correction against the original problem or documentation.",bank:null,ref:null});localStorage.setItem(errorsKey,JSON.stringify(errors));localStorage.setItem(customKey,JSON.stringify(custom));document.getElementById("errorQuestion").value="";document.getElementById("errorLesson").value="";renderErrors();buildQueue();toast("Error saved and card created.")}
 document.getElementById("bankSearch").oninput=renderBank;document.getElementById("bankCategory").onchange=renderBank;document.getElementById("bankLevel").onchange=renderBank;
