@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {fileURLToPath} from 'node:url';
+import {mkdir} from 'node:fs/promises';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const args=['--no-sandbox'];
+if(process.env.TEST_PROXY_CERT_BYPASS==='1')args.push('--ignore-certificate-errors');
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||undefined,args,headless:true,proxy:process.env.HTTPS_PROXY?{server:process.env.HTTPS_PROXY,bypass:'127.0.0.1,localhost'}:undefined});
+const page=await browser.newPage({viewport:{width:1536,height:1024},timezoneId:'America/Asuncion',ignoreHTTPSErrors:process.env.TEST_PROXY_CERT_BYPASS==='1'});
+page.setDefaultTimeout(90000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const base=process.env.TEST_URL||'http://127.0.0.1:8000';
+const fixture=name=>fileURLToPath(new URL('./fixtures/'+name,import.meta.url));
+const out=process.env.TEST_SCREENSHOTS||'/tmp/interview-helper-qa';await mkdir(out,{recursive:true});
+try{
+ if(process.env.TEST_PDFJS_DIR)await page.route('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/*',route=>route.fulfill({path:process.env.TEST_PDFJS_DIR+'/'+new URL(route.request().url()).pathname.split('/').pop(),contentType:'text/javascript',headers:{'Access-Control-Allow-Origin':'*'}}));
+ await page.goto(base);await page.waitForFunction(()=>window.Study);await page.evaluate(()=>Study.math());await page.locator('#mathPDF').setInputFiles(fixture('textbook-fixture.pdf'));await page.locator('#saveTextbook').click();await page.locator('#mathUnit').selectOption('1');
+ const swap=page.locator('#swapMathSides');
+ const check=async(left)=>{const d=await page.evaluate(()=>{const g=document.querySelector('#mathStage .reading-grid'),w=g.querySelector('.study-working'),m=g.querySelector('.study-material,.textbook-pane');return {first:g.firstElementChild===m,wx:w.getBoundingClientRect().x,mx:m.getBoundingClientRect().x}});assert.equal(d.first,left);assert.equal(d.mx<d.wx,left)};
+ await check(false);await page.locator('#videoHolder iframe').waitFor({state:'attached'});await page.evaluate(()=>window.originalPlayer=document.querySelector('#videoHolder iframe'));await swap.click();await check(true);assert.equal(await page.evaluate(()=>originalPlayer===document.querySelector('#videoHolder iframe')),true);await page.screenshot({path:out+'/watch-left.png',fullPage:true});await swap.click();await check(false);await page.screenshot({path:out+'/watch-right.png',fullPage:true});
+ await page.locator('[data-step="read"]').click();await page.locator('#mathNotes').fill('Notes survive swapping');await page.locator('#pdfPage').fill('3');await page.locator('#pdfPage').dispatchEvent('change');await swap.click();await check(true);assert.equal(await page.locator('#mathNotes').inputValue(),'Notes survive swapping');assert.equal(await page.locator('#pdfPage').inputValue(),'3');
+ await page.locator('[data-step="practice"]').click();await check(true);await page.locator('#exerciseWork').fill('Working survives swapping');await swap.click();await check(false);assert.equal(await page.locator('#exerciseWork').inputValue(),'Working survives swapping');await page.locator('#exerciseDone').click();
+ await page.locator('[data-step="review"]').click();await check(false);await page.locator('#mathCardQ').fill('Question draft');await page.locator('#mathCardA').fill('Answer draft');await swap.click();await check(true);assert.equal(await page.locator('#mathCardQ').inputValue(),'Question draft');assert.equal(await page.locator('#mathCardA').inputValue(),'Answer draft');await page.screenshot({path:out+'/review-left.png',fullPage:true});await swap.click();await page.screenshot({path:out+'/review-right.png',fullPage:true});await page.locator('#mathCardSave').click();assert.ok(await page.evaluate(()=>JSON.parse(localStorage.getItem('interview-helper-custom-cards-v1')).some(c=>c.q==='Question draft')));
+ await swap.click();await page.reload();await page.waitForFunction(()=>window.Study);await page.evaluate(()=>Study.math());await page.locator('#swapMathSides').waitFor();await check(true);
+ for(const step of ['watch','read','practice','review']){await page.locator('[data-step="'+step+'"]').click();for(const [width,height] of [[1920,1080],[1920,900],[1366,768],[768,1024],[390,844],[320,740]]){await page.setViewportSize({width,height});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,step+' overflow '+width);await swap.click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);if(width===390)await page.screenshot({path:out+'/'+step+'-phone.png',fullPage:true});}await page.setViewportSize({width:1536,height:1024});}
+ assert.deepEqual(errors,[]);console.log('PASS: all four stages swap, material iframe stays mounted, PDF page and drafts survive, review card creation works, preference survives reload, desktop/tablet/phone fit.');
+}catch(e){await page.screenshot({path:out+'/failure.png',fullPage:true});console.error(await page.locator('#mathMessage').textContent());throw e}finally{await browser.close()}
