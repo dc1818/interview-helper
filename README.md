@@ -4,21 +4,20 @@ A self-contained interview preparation dashboard for junior software engineering
 
 ## Features
 
-- Twelve-week schedule with daily time blocks and direct study links
+- Daily dashboard showing scheduled lessons, actual time blocks and ready reviews
+- Sequential Odin, CS50P, JavaScript and algorithm study tracks
 - A sourced interview-question bank covering software, web, algorithms, SQL, data engineering, testing, system design, and behavioral interviews
 - Concise and expanded answers with examples, common traps, question-bank attribution, and technical-reference links
 - Browser-based spaced-repetition scheduling with Again, Hard, Good, and Easy ratings
 - Custom flashcard creation
 - Error log that turns mistakes into future review cards
-- Technical speaking prompts with a 90-second timer
-- Role-specific study adjustments
 - Progress stored locally in the browser
-- Focused Daily Workspace layout with separate Today, Schedule, Flashcards, Question Bank, Speaking, Resources, and Progress views
+- Vivid green/purple wireframe dashboard with secondary study tools in one collapsed section
 - Responsive single-page design with no build step or external runtime dependency
 
 ## Run locally
 
-Open `index.html` in a browser, or serve the folder with any static web server.
+Serve the folder with any static web server (required for the local SVG icon sprite).
 
 ```bash
 python -m http.server 8000
@@ -32,4 +31,6 @@ Schedule progress, flashcard review history, custom cards, and error-log entries
 
 ## Hosting
 
-The repository is ready for GitHub Pages from the `main` branch and repository root.
+Pushes to `main` deploy through `.github/workflows/pages.yml`.
+
+See DESIGN.md for the approved visual direction and interface validation checklist.
