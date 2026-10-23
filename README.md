@@ -13,7 +13,7 @@ A self-contained interview preparation dashboard for junior software engineering
 - Error log that turns mistakes into future review cards
 - Progress stored locally in the browser
 - Vivid green/purple wireframe dashboard with secondary study tools in one collapsed section
-- Responsive single-page design with no build step or external runtime dependency
+- Responsive single-page design with no build step; integrated study tools load their documented runtimes on demand
 
 ## Run locally
 
@@ -27,10 +27,38 @@ Then visit `http://localhost:8000`.
 
 ## Data storage
 
-Schedule progress, flashcard review history, custom cards, and error-log entries are stored in browser `localStorage`. Nothing is sent to a server.
+Schedule progress, flashcard review history, custom cards, and error-log entries are stored in browser `localStorage`. The textbook, notes and progress stay in this browser. Rust code runs through Rust Playground; video embeds and runtime downloads contact their respective services.
 
 ## Hosting
 
 Pushes to `main` deploy through `.github/workflows/pages.yml`.
 
 See DESIGN.md for the approved visual direction and interface validation checklist.
+
+## Integrated study
+
+- **Learning tracks & textbook** opens the discrete mathematics importer, Rust foundations and all algorithm practice workspaces.
+- Import your own text-based Rosen PDF. The importer checks the title and author, detects numbered sections, and asks you to confirm physical PDF page ranges for your edition. Files are kept in this browser's IndexedDB; clearing site data removes them. Export math progress from Textbook & course. The export excludes the textbook and videos.
+- The real 85-video mapping comes from Discrete Mathematics Study Helper release 2.8.12. Watch completion is manual. Reading and exercise completion are shared across groups that revisit a section. The importer uses PDF bookmarks when available, preserves shared boundary pages, and links section exercises, odd-numbered answers and optional chapter material. Unmatched page references can be corrected manually. Answers are never fabricated or automatically graded.
+- Scanned PDFs require OCR before import. The web parser is a browser adaptation with editable boundaries, not the desktop PyMuPDF parser; see THIRD_PARTY.md.
+- Scheduled algorithms have original Python exercises and runnable practice tests. Python can use small imported text/CSV/JSON files and supplied stdin lines. They are temporary per run.
+- JavaScript runs in a worker. Odin workspaces also offer a sandboxed HTML/CSS/JavaScript preview. Backend servers/databases and official course checks remain in the linked development environment.
+- Rust currently provides four foundation lessons (mutability, functions, borrowing, Option/match) with real compilation via Rust Playground. Running code sends only that code to the public service, as stated beside the button.
+- Runtime downloads and YouTube require internet access. Code and notes remain saved if a service fails. Code drafts are private browser storage, not cloud synchronization.
+
+## Checks
+
+```bash
+npm install
+npm test
+npx playwright install chromium
+python -m http.server 8000
+# In another terminal:
+npm run test:browser
+```
+
+Browser tests use an isolated profile, a synthetic PDF (no textbook content), and the actual Python/JavaScript/Rust runtimes. They cover completion/reload, stop, PDF rejection/import, reading, exercises, answer links, notes, review cards and desktop/tablet/phone overflow. The Rust test needs its public service to be available. Set TEST_SCREENSHOTS for screenshot output, TEST_URL for an alternate local server, or CHROMIUM_EXECUTABLE_PATH for a locally installed Chromium. No personal textbook is included in tests.
+
+The user-supplied 1,118-page Rosen eighth-edition PDF was checked privately during implementation: 72 numbered sections, section exercise starts and odd-numbered answer references were detected. All mapped video groups matched a section. The copyrighted PDF and its extracted text are excluded from this repository.
+
+To repeat that private integration check with your own copy: `TEST_TEXTBOOK=/absolute/path/to/your/rosen-eighth-edition.pdf npm run test:textbook` while the local server is running.

@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/vivid.css">
+  <link rel="stylesheet" href="assets/study.css">
 </head>
 <body>
 <div class="app">
@@ -480,7 +481,8 @@ if(kind==="srs")return{title:"Flashcards: answer aloud",steps:["Answer due cards
 if(kind==="notes")return{title:"Save your stopping point + one useful card",steps:["Write the exact Odin section, exercise or bug to resume.","If you learned a concept you could not explain, add one short question and a verified answer to Flashcards. Include its lesson URL in your answer.","If nothing new needs a card, test an edge case and record the result."],done:"Save a resume note and, when useful, one personal flashcard.",kind};
 const n=Number(localStorage.getItem("interview-helper-code-next-v1")||0),flat=codingSets.flat(),name=flat[n%flat.length];return{title:(d===5?"Timed practice: ":"LeetCode: ")+name,steps:["Open the search result with the exact title “"+name+"”. Use Python. Solve locally if you prefer not to sign in.",d===5?"Set a 25-minute timer, then spend five minutes recording the result.":"Spend 30 minutes attempting the problem without solutions, then 15 minutes testing and explaining complexity.","If you are stuck, record a useful hint and resume this same problem next time. Advance only when you have reviewed the attempt and understand the approach."],done:"Save code, test cases, complexity and one recognition cue.",url:"https://leetcode.com/problemset/?search="+encodeURIComponent(name),kind:"code"};
 }
-function openAssignment(w,d,i){const openedDate=localDate(),a=assignment(w,d,i),blockId=openedDate+"-"+a.kind,isToday=d===position().day,body=document.getElementById("lessonBody"),add=(tag,text)=>{const e=document.createElement(tag);e.textContent=text;body.append(e);return e};document.getElementById("lessonTitle").textContent=a.title;body.replaceChildren();add("p",weekdays[d].tasks[i][0]+" minutes available today. A lesson or problem can take several sessions.");const ol=add("ol","");a.steps.forEach(text=>{const li=document.createElement("li");li.textContent=text;li.style.margin="8px 0";ol.append(li)});add("p","Complete when: "+a.done);const link=(text,url)=>{const el=add("a",text);el.href=url;el.target="_blank";el.rel="noopener";el.style.display="block";el.style.margin="10px 0"};if(a.url)link(a.kind==="python"?(a.problem?"Open CS50P problem":"Open CS50P lesson"):"Open course / problem",a.url);if(a.kind==="python"){link("Open CS50 coding environment","https://cs50.dev/");}
+function openAssignment(w,d,i){if(window.Study)return Study.open(w,d,i);return openLegacyAssignment(w,d,i)}
+function openLegacyAssignment(w,d,i){const openedDate=localDate(),a=assignment(w,d,i),blockId=openedDate+"-"+a.kind,isToday=d===position().day,body=document.getElementById("lessonBody"),add=(tag,text)=>{const e=document.createElement(tag);e.textContent=text;body.append(e);return e};document.getElementById("lessonTitle").textContent=a.title;body.replaceChildren();add("p",weekdays[d].tasks[i][0]+" minutes available today. A lesson or problem can take several sessions.");const ol=add("ol","");a.steps.forEach(text=>{const li=document.createElement("li");li.textContent=text;li.style.margin="8px 0";ol.append(li)});add("p","Complete when: "+a.done);const link=(text,url)=>{const el=add("a",text);el.href=url;el.target="_blank";el.rel="noopener";el.style.display="block";el.style.margin="10px 0"};if(a.url)link(a.kind==="python"?(a.problem?"Open CS50P problem":"Open CS50P lesson"):"Open course / problem",a.url);if(a.kind==="python"){link("Open CS50 coding environment","https://cs50.dev/");}
 if(a.questionLinks)a.questionLinks.forEach(q=>link(q.title,q.url));
 const actions=add("div","");actions.className="lesson-actions";
 if(a.kind==="srs"){const b=document.createElement("button");b.textContent="Review aloud";actions.append(b);b.className="button";b.onclick=()=>{document.getElementById("lessonDialog").close();document.getElementById("deckFilter").value="due";go("flashcards")};}
@@ -505,7 +507,7 @@ function renderDashboardReviews(){
 function renderToday(){
   const now=new Date(),p=position(now),plan=dailyPlan(now),lessons=dashboardLessons(now),target=document.getElementById("todayTasks");
   const available=lessons.filter(t=>!t.complete&&!t.assignment.finished),done=lessons.filter(t=>t.complete||t.assignment.finished).length;
-  const totalMinutes=plan.reduce((n,t)=>n+t.minutes,0),lessonMinutes=lessons.reduce((n,t)=>n+t.minutes,0),reviewMinutes=totalMinutes-lessonMinutes;
+  const lessonMinutes=lessons.reduce((n,t)=>n+t.minutes,0),reviewMinutes=plan.filter(t=>weekdays[t.d].tasks[t.i][3]==="srs").reduce((n,t)=>n+t.minutes,0),totalMinutes=lessonMinutes+reviewMinutes;
   const date=document.getElementById("todayDate");date.textContent=new Intl.DateTimeFormat(undefined,{weekday:"long",month:"short",day:"numeric"}).format(now);date.dateTime=localDate(now);
   document.getElementById("dashboardSubtitle").textContent=lessons.length?"A little recall. "+lessons.length+" learning block"+(lessons.length===1?"":"s")+". About "+totalMinutes+" minutes.":"A day to rest. Your next lessons will be here when you return.";
   document.getElementById("todayLessonCount").textContent=available.length;
@@ -515,7 +517,7 @@ function renderToday(){
   document.getElementById("dailyTimeSummary").textContent=lessons.length?"Reviews: about "+reviewMinutes+" min · Lessons: about "+lessonMinutes+" min":"Reviews are optional on your rest day.";
   document.getElementById("dailyPlanNote").textContent=lessons.length?"Today follows your existing "+weekdays[p.day].name+" routine. Work at your own pace; a lesson can take more than one session.":"Sunday rest. Missed days do not add extra new lessons.";
   target.replaceChildren();
-  const subjects={python:["Python","braces","Work through the examples, then test your understanding."],odin:["Full-stack web","panels-top-left","Build the assignment and check how each part works."],code:["Algorithms","code-xml","Solve the problem, test it, and explain the complexity."],jsden:["JavaScript","braces","Explain the ideas aloud, then check your reasoning."],notes:["Study notes","book-open-check","Save the exact point where you want to resume."]};
+  const subjects={math:["Discrete mathematics","book-open-check","Watch, read and practice your current section."],rust:["Rust","code-xml","Learn the concept, run your code and explain it."],python:["Python","braces","Work through the examples, then test your understanding."],odin:["Full-stack web","panels-top-left","Build the assignment and check how each part works."],code:["Algorithms","code-xml","Solve the problem, test it, and explain the complexity."],jsden:["JavaScript","braces","Explain the ideas aloud, then check your reasoning."],notes:["Study notes","book-open-check","Save the exact point where you want to resume."]};
   lessons.forEach((t,index)=>{
     const a=t.assignment,finished=t.complete||a.finished,[subject,icon,note]=subjects[a.kind]||["Practice","code-xml",a.steps[0]];
     const row=document.createElement("article");row.className="daily-task"+(finished?" complete":"")+(available[0]===t?" next":"");
@@ -526,7 +528,7 @@ function renderToday(){
     description.className="daily-note";description.textContent=t.complete?"Completed today. Your next item waits for the next study day.":a.finished?"You’ve completed this selected track.":note;copy.append(label,title,description);
     const time=document.createElement("span");time.className="daily-time";time.append(dashboardIcon("clock"),document.createTextNode(t.minutes+" min"));
     const action=document.createElement(finished?"span":"button");action.className=finished?"daily-status":"daily-open";
-    if(finished)action.textContent=t.complete?"✓ Complete":"✓ Track complete";else{action.type="button";action.setAttribute("aria-label","Open "+a.title);action.append(document.createTextNode(available[0]===t?"Start":"Open"),dashboardIcon("arrow-right"));action.onclick=()=>openAssignment(t.w,t.d,t.i);}
+    if(finished)action.textContent=t.complete?"✓ Complete":"✓ Track complete";else{action.type="button";action.setAttribute("aria-label","Open "+a.title);action.append(document.createTextNode(available[0]===t?"Start":"Open"),dashboardIcon("arrow-right"));action.onclick=()=>t.open?t.open():openAssignment(t.w,t.d,t.i);}
     row.append(marker,number,dashboardIcon(icon,"icon daily-icon"),copy,time,action);target.append(row);
   });
   if(!lessons.length){const empty=document.createElement("div");empty.className="daily-empty";const title=document.createElement("h3"),text=document.createElement("p");title.textContent="Nothing new to finish today.";text.textContent="Your unfinished lessons stay saved for the next scheduled study day.";empty.append(title,text);target.append(empty);}
@@ -567,11 +569,12 @@ const weekSelect=document.getElementById("customWeek");for(let w=1;w<=12;w++){co
 document.getElementById("closeLesson").onclick=()=>document.getElementById("lessonDialog").close();
 let displayedDate=localDate();function refreshDate(){if(localDate()!==displayedDate){displayedDate=localDate();document.getElementById("lessonDialog").close();renderToday();renderAllProgress()}else renderDashboardReviews()}setInterval(refreshDate,30000);window.addEventListener("focus",refreshDate);
 
-document.getElementById("startLessons").onclick=()=>{refreshDate();const next=dashboardLessons().find(t=>!t.complete&&!t.assignment.finished);if(next)openAssignment(next.w,next.d,next.i);else renderToday()};
+document.getElementById("startLessons").onclick=()=>{refreshDate();const next=dashboardLessons().find(t=>!t.complete&&!t.assignment.finished);if(next){if(next.open)next.open();else openAssignment(next.w,next.d,next.i);}else renderToday()};
 document.getElementById("startReviews").onclick=()=>{document.getElementById("deckFilter").value="due";go("flashcards")};
 document.getElementById("lessonDialog").addEventListener("close",()=>{const first=document.querySelector("#view-today.active .daily-open");if(first)first.focus({preventScroll:true})});
 
 renderPlanner();renderToday();renderAllProgress();renderErrors();renderBank();renderResources("All");buildQueue();
 </script>
+<script type="module" src="assets/study.js"></script>
 </body>
 </html>

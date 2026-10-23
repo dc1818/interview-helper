@@ -1,0 +1,68 @@
+<!doctype html><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; worker-src blob:; connect-src https://cdn.jsdelivr.net;">
+<script id="worker-source" type="text/plain">
+
+let output='',limited=false;
+const capture=s=>{if(output.length<40000)output+=s+'\n';else limited=true};
+try {
+ const {loadPyodide}=await import('https://cdn.jsdelivr.net/npm/pyodide@314.0.7/pyodide.mjs');
+ const py=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/npm/pyodide@314.0.7/',stdout:capture,stderr:capture});
+ postMessage({type:'ready'});
+ onmessage=async({data})=>{
+  try{
+   output='';limited=false;
+   const inputLines=(data.stdin||'').split('\n');py.setStdin({stdin:()=>inputLines.shift()});
+   py.globals.set('_payload',JSON.stringify(data));
+   const result=await py.runPythonAsync(`
+import json, copy, traceback
+_payload_data = json.loads(_payload)
+_scope = {"__name__": "__main__"}
+for _file in _payload_data.get("files", []):
+    with open(_file["name"], "w") as _f:
+        _f.write(_file["text"])
+_results = []
+try:
+    exec(_payload_data["code"], _scope)
+    for _test in _payload_data.get("tests", []):
+        try:
+            _args = copy.deepcopy(_test["args"])
+            _actual = _scope["solve"](*_args)
+            _expected = _test["expected"]
+            _ok = _actual == _expected
+            _title = _payload_data.get("title", "")
+            if _title in ("Two Sum", "Two Sum II - Input Array Is Sorted") and _expected:
+                _offset = 1 if _title.startswith("Two Sum II") else 0
+                _ok = isinstance(_actual, (list, tuple)) and len(_actual) == 2 and all(type(x) is int for x in _actual)
+                if _ok:
+                    _i, _j = [x - _offset for x in _actual]
+                    _ok = _i != _j and 0 <= _i < len(_args[0]) and 0 <= _j < len(_args[0]) and _args[0][_i] + _args[0][_j] == _args[1]
+            if _title == "Top K Frequent Elements":
+                _ok = sorted(_actual) == sorted(_expected)
+            if _title == "Clone Graph":
+                _ok = _ok and _actual is not _args[0] and all(_actual[k] is not _args[0][k] for k in _actual)
+            _results.append({"name":_test["name"], "passed":bool(_ok), "actual":repr(_actual)[:1000], "expected":repr(_expected)[:1000]})
+        except Exception as e:
+            _results.append({"name":_test["name"], "passed":False, "error":str(e)[:2000]})
+    _result = {"tests":_results}
+except Exception:
+    _result = {"error":traceback.format_exc()[-5000:], "tests":[]}
+json.dumps(_result)
+`);
+   postMessage({type:'result',...JSON.parse(result),output:output+(limited?'\nOutput truncated.':'')});
+  }catch(e){postMessage({type:'result',error:String(e),output})}
+ };
+}catch(e){postMessage({type:'result',error:'Python could not load. Check your connection and retry. '+String(e)})}
+</script>
+<script>
+let worker;
+addEventListener('message',event=>{
+ if(event.source!==parent)return;
+ if(event.data.type!=='run')return;
+ const payload=event.data.payload;
+ const url=URL.createObjectURL(new Blob(['(async()=>{'+document.getElementById('worker-source').textContent+'})()'],{type:'text/javascript'}));
+ worker=new Worker(url);
+ worker.onerror=e=>parent.postMessage({type:'result',error:e.message||('Python worker failed at '+(e.filename||'module startup')+':'+e.lineno)},'*');
+ worker.onmessage=({data})=>{parent.postMessage(data,'*');if(data.type==='ready')worker.postMessage(payload);};
+});
+parent.postMessage({type:'frame-ready'},'*');
+</script>

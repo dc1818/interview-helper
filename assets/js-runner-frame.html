@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; worker-src blob:;">
+<script id="worker-source" type="text/plain">
+onmessage=async({data})=>{
+ let output='';
+ console.log=(...args)=>{if(output.length<40000)output+=args.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' ')+'\n'};
+ console.error=console.warn=console.log;
+ try{const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;await new AsyncFunction(data.code)();await new Promise(resolve=>setTimeout(resolve,0));postMessage({type:'result',output})}
+ catch(e){postMessage({type:'result',output,error:String(e)})}
+};
+</script>
+<script>
+addEventListener('message',event=>{
+ if(event.source!==parent||event.data.type!=='run')return;
+ const url=URL.createObjectURL(new Blob([document.getElementById('worker-source').textContent],{type:'text/javascript'}));
+ const worker=new Worker(url);
+ worker.onmessage=({data})=>parent.postMessage(data,'*');
+ worker.onerror=e=>parent.postMessage({type:'result',error:e.message||'JavaScript worker failed.'},'*');
+ worker.postMessage({code:event.data.code});
+});
+parent.postMessage({type:'frame-ready'},'*');
+</script>

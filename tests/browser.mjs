@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import {fileURLToPath} from 'node:url';
+import {mkdir} from 'node:fs/promises';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const args=['--no-sandbox'];
+if(process.env.TEST_PROXY_CERT_BYPASS==='1')args.push('--ignore-certificate-errors');
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||undefined,args,headless:true,proxy:process.env.HTTPS_PROXY?{server:process.env.HTTPS_PROXY,bypass:'127.0.0.1,localhost'}:undefined});
+const page=await browser.newPage({viewport:{width:1536,height:1024},timezoneId:'America/Asuncion',ignoreHTTPSErrors:process.env.TEST_PROXY_CERT_BYPASS==='1'});
+page.setDefaultTimeout(90000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const base=process.env.TEST_URL||'http://127.0.0.1:8000';
+const fixture=name=>fileURLToPath(new URL('./fixtures/'+name,import.meta.url));
+const out=process.env.TEST_SCREENSHOTS||'/tmp/interview-helper-qa';await mkdir(out,{recursive:true});
+try{
+ await page.clock.setFixedTime(new Date('2026-10-23T15:00:00Z'));
+ await page.goto(base);await page.waitForFunction(()=>window.Study);
+ await page.evaluate(()=>localStorage.setItem('interview-helper-extra-tracks-v1',JSON.stringify({python:0,jsden:0,notes:{retained:'keep me'}})));
+ await page.locator('#startLessons').click();assert.match(await page.locator('#workspaceRoot h1').textContent(),/Two Sum/);
+ const solution='def solve(values, target):\n    for i in range(len(values)):\n        for j in range(i+1, len(values)):\n            if values[i]+values[j] == target: return [i,j]\n    return []';
+ await page.locator('#studyCode').fill(solution);await page.locator('#studyReason').fill('Visit every pair. O(n²) time and O(1) auxiliary space. Distinct indices matter.');
+ await page.locator('#studyRun').click();await page.waitForFunction(()=>!document.getElementById('studyRun').disabled);assert.equal(await page.locator('#runStatus').textContent(),'All practice tests passed.');
+ await page.screenshot({path:out+'/algorithms.png',fullPage:true});await page.locator('#studyFinish').click();assert.equal(await page.evaluate(()=>localStorage.getItem('interview-helper-code-next-v1')),'1');
+ await page.reload();await page.waitForFunction(()=>window.Study);assert.equal(await page.locator('.daily-task.complete').count(),1);assert.match(await page.locator('.daily-task.complete').textContent(),/Two Sum/);
+ // Actual JavaScript execution in a sandboxed worker.
+ await page.getByRole('button',{name:/Open JS Den:/}).click();await page.locator('#studyCode').fill('await Promise.resolve(); console.log([1,2,3].map(x=>x*2));');await page.locator('#studyRun').click();await page.waitForFunction(()=>!document.getElementById('studyRun').disabled);assert.match(await page.locator('#runOutput').textContent(),/\[2,4,6\]/);
+ await page.locator('#backDashboard').click();await page.evaluate(()=>Study.tracks());await page.locator('#openRustTrack').click();await page.locator('#studyCode').fill('fn main() { let mut count = 1; count += 1; println!("{}", count); }');await page.locator('#studyReason').fill('mut makes the change explicit.');await page.locator('#studyRun').click();await page.waitForFunction(()=>!document.getElementById('studyRun').disabled);assert.equal(await page.locator('#runStatus').textContent(),'Expected output matched.');await page.screenshot({path:out+'/rust.png',fullPage:true});await page.locator('#studyFinish').click();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('interview-helper-rust-v1'))),1);
+ // Python drafts persist and infinite loops can be stopped without freezing the UI.
+ await page.evaluate(()=>Study.tracks());await page.locator('#openAlgorithmTrack').click();assert.equal(await page.locator('#studyCode').inputValue(),solution);await page.locator('#studyCode').fill('while True:\n    pass');await page.locator('#studyRun').click();await page.waitForFunction(()=>document.getElementById('runStatus').textContent==='Running Python…');await page.locator('#studyStop').click();assert.match(await page.locator('#runStatus').textContent(),/Stopped/);
+ // Invalid import is rejected; valid local fixture is indexed and persists in IndexedDB.
+ await page.evaluate(()=>Study.math());await page.locator('#mathPDF').setInputFiles(fixture('wrong.pdf'));await page.waitForFunction(()=>document.getElementById('mathMessage').textContent.includes('Import failed'));assert.match(await page.locator('#mathMessage').textContent(),/title and author/);
+ await page.locator('#mathPDF').setInputFiles(fixture('textbook-fixture.pdf'));await page.locator('#saveTextbook').waitFor();assert.equal(await page.locator('#sectionRows tr').count(),3);await page.locator('#saveTextbook').click();await page.locator('#mathUnit').waitFor();assert.equal(await page.locator('[data-step="read"]').isDisabled(),true);await page.locator('#markVideo').click();await page.locator('#finishUnit').click();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('interview-helper-odin-blocks-v1'))['2026-10-23-math']),true);
+ await page.reload();await page.waitForFunction(()=>window.Study);await page.evaluate(()=>Study.math());await page.locator('#mathUnit').waitFor();assert.equal(await page.locator('#mathUnit').inputValue(),'1');
+ await page.locator('[data-step="read"]').click();await page.waitForFunction(()=>document.getElementById('readerStatus')?.textContent.includes('PDF page'));await page.locator('#mathNotes').fill('A set records distinct members.');await page.locator('#markMathRead').click();await page.locator('#goMathPractice').click();await page.locator('#exerciseWork').fill('My exercise reasoning.');await page.locator('#exerciseDone').click();assert.equal(await page.locator('#revealMathAnswer').isDisabled(),true);await page.locator('#pdfPage').fill('7');await page.locator('#pdfPage').dispatchEvent('change');await page.locator('#saveAnswerPage').click();await page.locator('#revealMathAnswer').click();assert.equal(await page.locator('#pdfPage').inputValue(),'7');
+ await page.locator('[data-step="review"]').click();await page.locator('#mathCardQ').fill('What does a set record?');await page.locator('#mathCardA').fill('Distinct members.');await page.locator('#mathCardSave').click();assert.ok(await page.evaluate(()=>JSON.parse(localStorage.getItem('interview-helper-custom-cards-v1')).some(c=>c.q==='What does a set record?')));
+ await page.reload();await page.waitForFunction(()=>window.Study);await page.evaluate(()=>Study.math());await page.locator('#mathUnit').waitFor();await page.locator('[data-step="read"]').click();assert.equal(await page.locator('#mathNotes').inputValue(),'A set records distinct members.');await page.locator('[data-step="practice"]').click();assert.equal(await page.locator('#exerciseWork').inputValue(),'My exercise reasoning.');
+ for(const [width,height] of [[1920,1080],[1920,900],[1366,768],[768,1024],[390,844],[320,740]]){
+  await page.setViewportSize({width,height});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'math overflow '+width);await page.screenshot({path:out+`/math-${width}.png`,fullPage:true});
+ }
+ await page.evaluate(()=>Study.tracks());for(const width of [1920,768,390,320]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'tracks overflow '+width)}
+ await page.locator('#openAlgorithmTrack').click();for(const width of [1920,768,390,320]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'coding overflow '+width);await page.screenshot({path:out+`/coding-${width}.png`,fullPage:true});}
+ // HTML/CSS/JS preview executes in its own opaque-origin sandbox.
+ await page.clock.setFixedTime(new Date('2026-10-24T15:00:00Z'));await page.evaluate(()=>{go('today');openAssignment(1,5,1)});await page.locator('#studyLanguage').selectOption('web');await page.locator('#studyRun').click();assert.equal(await page.locator('#webPreview iframe').count(),1);assert.equal(await page.frameLocator('#webPreview iframe').locator('h1').textContent(),'My study list');await page.screenshot({path:out+'/web-preview.png',fullPage:true});
+ await page.clock.setFixedTime(new Date('2026-10-25T15:00:00Z'));await page.evaluate(()=>go('today'));assert.equal(await page.evaluate(()=>dashboardLessons().some(x=>['math','rust'].includes(x.assignment.kind))),false,'Sunday remains a rest day');
+ const cardId=await page.evaluate(()=>{go('flashcards');queue=reviewPool().slice(0,1);showCard();return current.id});await page.evaluate(()=>revealCard());await page.locator('[data-rate="good"]').click();assert.ok(await page.evaluate(id=>srs[id].reviews>0&&srs[id].due>Date.now(),cardId));
+ assert.deepEqual(errors,[]);console.log('PASS: real Python/JavaScript/Rust execution, completion/reload, drafts, stop, PDF verification/import/reader, notes/exercises/answers, review cards, private persistence, responsive views and sandboxed HTML preview.');
+}finally{await browser.close()}
