@@ -21,3 +21,9 @@ Math uses Watch / Read / Practice / Review, with consecutive playlist groups and
 Coding has a task column, editable code, tests/output, and reasoning. Python and JavaScript run in opaque-origin sandbox frames and terminable workers. Python loads pinned Pyodide on demand. Rust code runs on the public Rust Playground only after an explicitly labeled action. HTML/CSS/JS previews are sandboxed with network access disabled. Failed runtime loading, errors, stop/timeouts and unsaved storage failures remain visible. Original course links and official CS50/LeetCode checks are distinct from local practice.
 
 All new records use separate keys; the original track indices, SRS and completion keys retain their meanings. Editable code/notes autosave, while course completion is explicit. Panels stack on tablets/phones, PDF pages scroll within their reader, and readable code can scroll horizontally inside its editor.
+
+## Extracted mathematics exercises
+
+Reading notes and exercise working sit on the left; the larger textbook reader sits on the right. On narrow screens, working comes first and the reader follows. Keep DOM and visual order aligned. The desktop reader stays visible while long question content scrolls.
+
+Practice extracts individual native PDF questions on demand, with an actual question selector, previous/next navigation, challenge markers, source excerpts preserving tables/diagrams/formulas, selectable text, and separate saved working. Shared directions stay with the relevant questions. Source page controls remain available. Question answers are hidden on selection and offered only when an exact section/number match was extracted; even-numbered answers are not invented. Completion is reversible. Existing saved books and numeric exercise drafts remain compatible; catalogs use separate versioned IndexedDB keys. Missing labels and parsing failures are explicit, with the source PDF still available.

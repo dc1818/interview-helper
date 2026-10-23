@@ -5,7 +5,8 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node tests/browser.mjs",
-    "test:textbook": "node tests/textbook.mjs"
+    "test:textbook": "node tests/textbook.mjs",
+    "test:exercises": "node tests/exercises.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.2"

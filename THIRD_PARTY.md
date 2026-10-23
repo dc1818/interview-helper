@@ -8,3 +8,5 @@
 - Lucide icons: license in assets/LUCIDE-LICENSE.
 
 External runtimes and embedded videos require internet access and may be unavailable. The application displays errors and preserves drafts. No LeetCode judge, account integration or hidden test suite is claimed. All local algorithm prompts and tests are original practice material.
+
+The native exercise adaptation also follows `parser_engine/EXERCISE_EXTRACTION_REQUIREMENTS.md` from the 2.8.12 release and the packaged `parse_numbered_questions`, `question_match_is_top_level`, `ExerciseStudyPage`, and answer-key behavior. The release's Python code-object metadata was inspected without running its Windows executable. The web implementation uses PDF.js font metadata, geometry, and native clipped rendering; it does not claim to execute the original Python parser. Question/answer text and source crops come exclusively from the user's private PDF, never from shipped textbook content.
