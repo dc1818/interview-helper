@@ -7,7 +7,8 @@
     "test:browser": "node tests/browser.mjs",
     "test:textbook": "node tests/textbook.mjs",
     "test:exercises": "node tests/exercises.mjs",
-    "test:math-layout": "node tests/math-layout.mjs"
+    "test:math-layout": "node tests/math-layout.mjs",
+    "test:solutions": "node tests/solutions.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.2"
